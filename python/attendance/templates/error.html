@@ -1,0 +1,7 @@
+{% from "components.html" import icon, brand %}
+{% extends "base.html" %}
+{% block title %}Request {{ code }} · QR Attendance{% endblock %}
+{% block content %}
+{{ brand(url_for('web.landing')) }}
+<div class="error-page"><span class="badge badge-neutral">HTTP {{ code }}</span><h1>Let’s get you<br>back on track.</h1><p role="alert">{{ message }}</p><a class="button button-primary" href="{{ url_for('web.dashboard') }}">Return to dashboard {{ icon('arrow') }}</a></div>
+{% endblock %}

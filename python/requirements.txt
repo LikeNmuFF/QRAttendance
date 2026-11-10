@@ -1,0 +1,4 @@
+Flask>=3.1.2,<4
+waitress>=3.0.2,<4
+qrcode[pil]>=8.2,<9
+opencv-python-headless>=4.10,<5

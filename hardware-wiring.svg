@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="420mm" viewBox="0 0 1600 2263" role="img" aria-labelledby="title desc">
+  <title id="title">QR attendance scanner wiring reference</title>
+  <desc id="desc">A3 wiring reference for an AI-Thinker ESP32-CAM, 16 by 2 I2C LCD, bidirectional level shifter, DFRobot DFPlayer Mini DFR0299, speaker, green/red status LEDs and USB-UART adapter, with voltage and pre-power safety checks.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f4f7fa}.ink{fill:#102130}.muted{fill:#536675}.white{fill:#fff}.panel{fill:#fff;stroke:#c9d5df;stroke-width:2}.title{font:700 48px Arial,sans-serif;fill:#102130}.subtitle{font:400 23px Arial,sans-serif;fill:#536675}.section{font:700 25px Arial,sans-serif;fill:#102130}.body{font:400 19px Arial,sans-serif;fill:#102130}.small{font:400 16px Arial,sans-serif;fill:#536675}.tiny{font:700 15px Arial,sans-serif;fill:#102130}.pin{font:700 18px Arial,sans-serif;fill:#102130}.value{font:700 18px Arial,sans-serif;fill:#102130}.warning{fill:#fff2d4;stroke:#c98400;stroke-width:2}.warningtext{font:700 18px Arial,sans-serif;fill:#744500}.danger{fill:#fff0ef;stroke:#bd3b35;stroke-width:2}.dangertext{font:700 18px Arial,sans-serif;fill:#8e2924}.mint{fill:#e8f6ef;stroke:#4c9b70;stroke-width:2}.blue{fill:#eaf2fc;stroke:#4f79b6;stroke-width:2}.line5{stroke:#d33b34;stroke-width:6;fill:none}.gnd{stroke:#243746;stroke-width:6;fill:none}.sda{stroke:#21835b;stroke-width:6;fill:none}.scl{stroke:#3476bf;stroke-width:6;fill:none}.uarttx{stroke:#bd6b12;stroke-width:6;fill:none}.uartrx{stroke:#7549a5;stroke-width:6;fill:none}.wirelabel{font:700 16px Arial,sans-serif}.redtxt{fill:#b02722}.greentxt{fill:#17613f}.bluetxt{fill:#235995}.orangetxt{fill:#94520c}.purpletxt{fill:#633b8b}.round{rx:16;ry:16}
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1600" height="2263" fill="#f4f7fa" />
+  <rect x="0" y="0" width="1600" height="22" fill="#4c9b70" />
+  <text class="title" x="70" y="100" font-weight="700" font-size="48" font-family="Arial,sans-serif" fill="#102130">QR ATTENDANCE SCANNER</text>
+  <text class="subtitle" x="72" y="145" font-weight="400" font-size="23" font-family="Arial,sans-serif" fill="#536675">AI-Thinker ESP32-CAM / OV3660 + 16x2 I2C LCD + DFPlayer + green/red LEDs</text>
+  <rect class="warning round" x="70" y="175" width="1460" height="105" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
+  <text class="warningtext" x="100" y="218" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#744500">REFERENCE FOR THESE MODULE ASSUMPTIONS ONLY</text>
+  <text class="body" x="100" y="250" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Match each module's exact pin labels and datasheet before wiring. If anything differs, STOP. Power off before every change.</text>
+
+  <text class="section" x="70" y="335" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">1. SIGNAL CONNECTIONS</text>
+  <rect class="panel round" x="70" y="365" width="500" height="505" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="70" y="365" width="500" height="58" rx="16" fill="#eaf2fc" />
+  <text class="section" x="100" y="404" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">AI-THINKER ESP32-CAM</text>
+  <text class="small" x="100" y="450" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Pin values match firmware/AttendanceCam/config.h</text>
+  <rect class="blue round" x="95" y="477" width="450" height="74" fill="#eaf2fc" stroke="#4f79b6" stroke-width="2" rx="16" ry="16" />
+  <text class="pin" x="120" y="507" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#102130">GPIO13</text><text class="body" x="250" y="507" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">I2C SDA -&gt; shifter LV1</text>
+  <text class="small" x="120" y="533" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Then matching HV1 -&gt; LCD SDA</text>
+  <rect class="blue round" x="95" y="563" width="450" height="74" fill="#eaf2fc" stroke="#4f79b6" stroke-width="2" rx="16" ry="16" />
+  <text class="pin" x="120" y="593" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#102130">GPIO14</text><text class="body" x="250" y="593" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">I2C SCL -&gt; shifter LV2</text>
+  <text class="small" x="120" y="619" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Then matching HV2 -&gt; LCD SCL</text>
+  <rect class="warning round" x="95" y="649" width="450" height="82" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
+  <text class="pin" x="120" y="681" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#102130">GPIO2 (TX)</text><text class="body" x="270" y="681" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">-&gt; 1 kOhm -&gt; DFPlayer RX</text>
+  <text class="small" x="120" y="710" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Keep the series resistor in this direction.</text>
+  <rect class="warning round" x="95" y="743" width="450" height="82" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
+  <text class="small" x="115" y="772" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">GPIO12 -&gt; 330R -&gt; GREEN anode; cathode -&gt; GND</text><circle cx="522" cy="766" r="8" fill="#16834b" />
+  <text class="small" x="115" y="806" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">GPIO15 -&gt; 330R -&gt; RED anode; cathode -&gt; GND</text><circle cx="522" cy="800" r="8" fill="#c53e3e" />
+  <text class="tiny" x="100" y="850" font-weight="700" font-size="15" font-family="Arial,sans-serif" fill="#102130">GPIO12: 10k to GND. Never pull high during reset.</text>
+
+  <rect class="panel round" x="610" y="365" width="420" height="505" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="610" y="365" width="420" height="58" rx="16" fill="#e8f6ef" />
+  <text class="section" x="640" y="404" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">I2C LEVEL SHIFTER</text>
+  <text class="body" x="650" y="470" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">LV reference  &lt;- ESP32 3V3</text>
+  <text class="body" x="650" y="510" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">HV reference  &lt;- regulated 5V</text>
+  <text class="body" x="650" y="550" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">GND           &lt;- common ground</text>
+  <line class="sda" x1="655" y1="603" x2="735" y2="603" stroke="#21835b" stroke-width="6" fill="none" /><text class="wirelabel greentxt" x="755" y="609" font-weight="700" font-size="16" font-family="Arial,sans-serif" fill="#17613f">CH 1: LV1 &lt;-&gt; HV1</text>
+  <line class="scl" x1="655" y1="653" x2="735" y2="653" stroke="#3476bf" stroke-width="6" fill="none" /><text class="wirelabel bluetxt" x="755" y="659" font-weight="700" font-size="16" font-family="Arial,sans-serif" fill="#235995">CH 2: LV2 &lt;-&gt; HV2</text>
+  <text class="small" x="650" y="716" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Channel numbering varies by board.</text>
+  <text class="small" x="650" y="744" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Follow the shifter's own labels/datasheet.</text>
+  <rect class="danger round" x="640" y="778" width="360" height="66" fill="#fff0ef" stroke="#bd3b35" stroke-width="2" rx="16" ry="16" />
+  <text class="dangertext" x="660" y="807" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">Never put LCD 5V I2C directly</text>
+  <text class="dangertext" x="660" y="831" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">onto ESP32 GPIO pins.</text>
+
+  <rect class="panel round" x="1070" y="365" width="460" height="505" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="1070" y="365" width="460" height="58" rx="16" fill="#fff2d4" />
+  <text class="section" x="1100" y="404" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">16x2 LCD + I2C BACKPACK</text>
+  <text class="body" x="1110" y="485" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">VCC -&gt; regulated 5V</text>
+  <text class="body" x="1110" y="530" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">GND -&gt; common ground</text>
+  <text class="body" x="1110" y="575" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">SDA -&gt; shifter HV1</text>
+  <text class="body" x="1110" y="620" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">SCL -&gt; shifter HV2</text>
+  <text class="small" x="1110" y="690" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Firmware address: 0x27</text>
+  <text class="small" x="1110" y="720" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Some backpacks use 0x3F.</text>
+  <text class="small" x="1110" y="780" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Verify backpack VCC and I2C pull-ups.</text>
+  <text class="small" x="1110" y="810" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Use the shifter unless exact docs confirm</text>
+  <text class="small" x="1110" y="837" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">the SDA/SCL levels are ESP32-safe.</text>
+
+  <text class="section" x="70" y="930" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">2. POWER, AUDIO, AND PROGRAMMING</text>
+  <rect class="panel round" x="70" y="960" width="700" height="390" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="70" y="960" width="700" height="58" rx="16" fill="#fff0ef" />
+  <text class="section" x="100" y="999" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">5V POWER + COMMON GROUND</text>
+  <rect class="danger round" x="100" y="1040" width="640" height="78" fill="#fff0ef" stroke="#bd3b35" stroke-width="2" rx="16" ry="16" />
+  <text class="dangertext" x="130" y="1073" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">Regulated 5.0V supply (+) -&gt; ESP32 5V, LCD VCC,</text>
+  <text class="dangertext" x="130" y="1099" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">DFPlayer VCC, and level shifter HV reference</text>
+  <rect class="panel round" x="100" y="1135" width="640" height="72" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <text class="body" x="130" y="1178" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Supply (-) / GND -&gt; every module GND + shifter GND</text>
+  <rect class="mint round" x="100" y="1224" width="640" height="82" fill="#e8f6ef" stroke="#4c9b70" stroke-width="2" rx="16" ry="16" />
+  <text class="body" x="130" y="1260" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">ESP32 3V3 -&gt; shifter LV reference only</text>
+  <text class="small" x="130" y="1288" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Use adequate 5V current; verify with a multimeter.</text>
+  <text class="small" x="100" y="1330" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Do not power this assembly from USB-UART 3V3.</text>
+
+  <rect class="panel round" x="810" y="960" width="720" height="390" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="810" y="960" width="720" height="58" rx="16" fill="#eaf2fc" />
+  <text class="section" x="840" y="999" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">DFPLAYER MINI DFR0299 + SPEAKER</text>
+  <text class="body" x="850" y="1065" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">VCC -&gt; regulated 5V     GND -&gt; common ground</text>
+  <text class="body" x="850" y="1110" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">RX &lt;- ESP32 GPIO2 through 1 kOhm series resistor</text>
+  <text class="body" x="850" y="1155" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">TX: LEAVE UNCONNECTED (GPIO15 is the red LED)</text>
+  <rect class="warning round" x="845" y="1180" width="650" height="72" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
+  <text class="warningtext" x="870" y="1210" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#744500">Speaker wires go only between SPK1 and SPK2.</text>
+  <text class="warningtext" x="870" y="1237" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#744500">Do not connect either speaker lead to GND.</text>
+  <text class="small" x="850" y="1290" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">DFPlayer has its own FAT16/32 microSD; do not use</text>
+  <text class="small" x="850" y="1318" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">the ESP32-CAM microSD slot with this pin assignment.</text>
+
+  <rect class="panel round" x="70" y="1380" width="1460" height="310" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <rect x="70" y="1380" width="1460" height="58" rx="16" fill="#eaf2fc" />
+  <text class="section" x="100" y="1419" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">USB-UART ADAPTER (FLASHING ONLY)</text>
+  <rect class="blue round" x="100" y="1460" width="670" height="74" fill="#eaf2fc" stroke="#4f79b6" stroke-width="2" rx="16" ry="16" />
+  <text class="body" x="130" y="1490" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Adapter TXD (3.3V logic) -&gt; ESP32 U0R / GPIO3</text>
+  <text class="small" x="130" y="1518" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Cross TX to RX; confirm adapter is 3.3V logic.</text>
+  <rect class="blue round" x="800" y="1460" width="690" height="74" fill="#eaf2fc" stroke="#4f79b6" stroke-width="2" rx="16" ry="16" />
+  <text class="body" x="830" y="1490" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Adapter RXD (3.3V logic) &lt;- ESP32 U0T / GPIO1</text>
+  <text class="small" x="830" y="1518" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Adapter GND -&gt; common GND. Adapter VCC: no connect.</text>
+  <text class="body" x="130" y="1580" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Flash mode: GPIO0 -&gt; GND, reset, upload; remove GPIO0-GND and reset to run.</text>
+  <text class="small" x="130" y="1620" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Keep the external regulated 5V supply as the only power source in this adapter setup.</text>
+  <rect class="danger round" x="100" y="1640" width="1390" height="34" fill="#fff0ef" stroke="#bd3b35" stroke-width="2" rx="16" ry="16" />
+  <text class="dangertext" x="120" y="1665" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">Do not connect adapter VCC and external 5V together. Power off before changing any wire.</text>
+
+  <text class="section" x="70" y="1760" font-weight="700" font-size="25" font-family="Arial,sans-serif" fill="#102130">3. PRE-POWER DOUBLE-CHECK</text>
+  <rect class="panel round" x="70" y="1790" width="1460" height="360" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
+  <text class="body" x="110" y="1845" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] Board is AI-Thinker ESP32-CAM; module labels match this diagram exactly.</text>
+  <text class="body" x="110" y="1893" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] 5V supply measured at 5.0V; polarity and all GND connections checked.</text>
+  <text class="body" x="110" y="1941" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] LCD SDA/SCL pass through the level shifter; LV=3V3 and HV=5V.</text>
+  <text class="body" x="110" y="1989" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] GPIO2 -&gt; 1k -&gt; DFPlayer RX; TX unconnected. LEDs have 330R; GPIO12 has 10k to GND.</text>
+  <text class="body" x="110" y="2037" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] Speaker connects only to SPK1/SPK2; no 5V signal reaches any ESP32 GPIO.</text>
+  <text class="body" x="110" y="2085" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">[ ] USB adapter VCC is disconnected; GPIO0 jumper is used only for flashing.</text>
+  <rect class="danger round" x="70" y="2170" width="1460" height="66" fill="#fff0ef" stroke="#bd3b35" stroke-width="2" rx="16" ry="16" />
+  <text class="dangertext" x="100" y="2200" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">If you cannot verify a pin, voltage, or polarity, do not power it. Have an electronics</text>
+  <text class="dangertext" x="100" y="2225" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#8e2924">technician check it first. This project has not had a physical hardware bench test.</text>
+</svg>
