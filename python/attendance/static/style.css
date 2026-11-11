@@ -38,3 +38,29 @@
 .camera-guide{position:absolute;left:50%;top:50%;height:78%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid #a9efc6;border-radius:8px;pointer-events:none}
 .camera-guide[hidden]{display:none}
 .scanner-feedback{font-size:13px;line-height:1.6;color:var(--text,#eff5f5);padding-block:12px;margin-block:0 12px;border-block:1px solid var(--line);overflow-wrap:anywhere}
+
+/* Calendar and teacher review reuse the existing workspace palette. */
+.student-workspace{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:24px;align-items:start}
+.student-workspace .students-panel,.student-workspace .register-panel{grid-column:auto;grid-row:auto}
+.month-navigation{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.month-navigation h2{margin:0;font-size:24px}
+.calendar-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:16px}.class-calendar{width:100%;table-layout:fixed;min-width:740px;border-collapse:collapse}.class-calendar th{padding:16px 12px}.class-calendar td{padding:0;vertical-align:top;height:142px;border:1px solid var(--line)}
+.calendar-day{display:flex;flex-direction:column;gap:7px;min-height:142px;padding:14px;color:var(--muted);font-size:12px;text-decoration:none}.calendar-day:hover{background:var(--surface)}.calendar-day:focus-visible{outline:2px solid var(--mint);outline-offset:-3px}.calendar-day.has-class{background:#192832}.calendar-day strong{color:var(--ink);font-size:13px}.calendar-number{font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}.calendar-day .badge{align-self:start;font-size:10px;white-space:normal}
+.correction{min-width:220px;max-width:360px;white-space:normal}.correction summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--mint)}.correction form{display:grid;gap:12px;padding-block:12px}.correction label{display:grid;gap:6px}select{font:inherit;color:#eff5f5;background:#121e28;border:1px solid var(--line);border-radius:8px;min-height:44px;padding:8px}select:focus-visible{outline:2px solid var(--mint)}
+.finalize-form{margin-block:28px;display:grid;justify-items:start;gap:16px}.confirm-finalize{display:flex;flex-direction:row;align-items:center;gap:12px;max-width:70ch}.confirm-finalize input{width:22px;height:22px;flex-shrink:0}.audit-history{margin-top:28px}.reason-cell{white-space:normal;min-width:180px;max-width:45ch;overflow-wrap:anywhere}
+@media(max-width:1000px){.student-workspace{grid-template-columns:1fr}.month-navigation{gap:12px}.month-navigation h2{font-size:20px}.workspace-nav>a:last-child{display:flex}.dashboard-toolbar{flex-wrap:wrap}}
+
+.qr-download-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:0 20px 14px}.qr-select-all{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px}.qr-select-all input,.qr-student-select{width:22px;height:22px;min-height:22px;flex-shrink:0;accent-color:var(--mint)}.qr-download-hint{padding:0 20px 14px}.qr-download-toolbar .button{font-size:12px}.qr-student-select{cursor:pointer}
+
+.qr-row-actions .table-action{display:flex;width:max-content;min-height:44px}
+
+.qr-message{display:flex;flex-direction:column;gap:8px;padding:0 20px 14px}.qr-message input{width:100%}
+
+/* Class and session controls extend the existing teacher workspace. */
+.workspace-context{display:flex;flex-wrap:wrap;align-items:end;gap:16px 24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.context-field{display:grid;gap:8px;min-width:0}.workspace-context form{display:flex;align-items:end;gap:10px;max-width:100%}.workspace-context label{min-width:0}.workspace-context select{width:100%;max-width:280px}.workspace-context button{flex-shrink:0}
+.context-note{flex-basis:100%;margin:0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}.context-note strong{color:var(--ink)}.context-note span{display:block;margin-top:5px}
+.scanner-selection{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px;margin-bottom:28px}.scanner-selection h2{font-size:18px;margin:0 0 10px}.scanner-selection p{margin:0 0 8px;overflow-wrap:anywhere}.scanner-selection form{max-width:340px}.scanner-selection button{white-space:normal;text-align:center}
+.class-management{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);align-items:start;gap:24px}.management-column{display:grid;gap:24px;min-width:0}.management-content{padding:0 20px 20px}.management-content form,form.management-content{display:grid;gap:16px}.management-content label{display:grid;gap:8px}.management-content input,.management-content select{width:100%;min-width:0}.management-content .hint{margin-top:12px}.management-content .button{justify-self:start}
+.class-management .panel{min-width:0}.class-management .panel-heading{flex-wrap:wrap;gap:12px}.class-management h2{overflow-wrap:anywhere}.session-list{list-style:none;padding:0;margin:0 0 24px}.session-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-block:10px}.session-list span{overflow-wrap:anywhere;min-width:0}.session-list a{font-size:12px;min-height:44px;display:flex;align-items:center;flex-shrink:0}
+@media(max-width:1000px){.class-management{grid-template-columns:1fr}.scanner-selection{align-items:start;flex-direction:column}.workspace-context form{flex:1 1 280px}.workspace-context .context-field{flex:1}.workspace-context select{max-width:none}}
+@media(max-width:480px){.workspace-context form{flex-wrap:wrap}.workspace-context .context-field{flex-basis:100%}.workspace-context button{width:100%}.scanner-selection form,.scanner-selection button{width:100%;max-width:none}.session-list li{align-items:start;flex-direction:column;gap:0}}

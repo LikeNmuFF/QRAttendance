@@ -2,7 +2,7 @@
 
 Return to the [project README](README.md) for the quick start, diagrams and hardware overview.
 
-A trusted-LAN attendance system for an AI-Thinker ESP32-CAM with OV3660/OV2640 camera and PSRAM, a 16×2 I2C LCD, and a DFPlayer Mini with a speaker. The ESP32 captures JPEG frames; local OpenCV on the laptop decodes the signed QR credential and Flask verifies it; SQLite records one check-in per student per Philippine calendar day (UTC+08:00).
+A trusted-LAN attendance system for an AI-Thinker ESP32-CAM with OV3660/OV2640 camera and PSRAM, a 16×2 I2C LCD, and a DFPlayer Mini with a speaker. The ESP32 captures JPEG frames; local OpenCV on the laptop decodes the signed QR credential and Flask verifies it; SQLite records one check-in per student per session per Philippine calendar day (UTC+08:00).
 
 The teacher dashboard supports student registration, printable QR cards, daily class start and optional end times, Present/Late/Absent attendance, date filtering, and Excel-friendly CSV downloads. Sign in through `/login` with username **admin** and your `ADMIN_PASSWORD`. The scanner uses a separate device token.
 
@@ -248,7 +248,7 @@ From the project root:
 
 All tests use temporary databases. They cover every declared endpoint, authentication, CSRF, validation, HTML escaping, CSV formula protection, safe database failures, storage persistence, foreign keys, concurrent duplicates, and the local midnight boundary. See [AUDIT.md](AUDIT.md) for the actual verification results and outstanding limitations. Hardware compilation and physical bench tests are separate from Python endpoint tests.
 
-There is one class schedule and one check-in per student per day. Multiple class sessions, check-out, automatic absence calculations, offline queue, individual teacher accounts and presenter identity verification are not included. Static QR codes can be copied. The dashboard refreshes saved attendance automatically about every two seconds.
+Classes have separate rosters and multiple named sessions. Each session has one schedule and one check-in per student per date. Explicit finalization marks missing enrolled students absent. Check-out, offline queue, individual teacher accounts and presenter identity verification are not included. Static QR codes can be copied. The dashboard refreshes saved attendance automatically about every two seconds.
 
 ## Registration, printing and attendance
 
@@ -306,8 +306,24 @@ Typography is self-hosted, so the app does not require online fonts, a JavaScrip
 
 ### Optional class end time and camera-only testing
 
-In **Class schedule**, set a start time and optionally an end time for the selected date, then choose **Save class schedule**. Times use Philippine time (UTC+08:00). End time must be later than start on the same date; overnight sessions are not supported. Blank end time means no closing time, preserving existing schedules. At the exact end time and afterward, new check-ins return `410 Class ended` without saving attendance. Already saved attendance still returns `Already recorded`. The normal Present/Late/Absent rules apply only while check-in is open.
+In **Session hours**, set a start time and optionally an end time for the selected class, session and date, then choose **Save session hours**. Times use Philippine time (UTC+08:00). End time must be later than start on the same date; overnight sessions are not supported. Blank end time means no closing time, preserving existing schedules. At the exact end time and afterward, new check-ins return `410 Class ended` without saving attendance. Already saved attendance still returns `Already recorded`. The normal Present/Late/Absent rules apply only while check-in is open.
 
 Start time locks after the first check-in. You can still change or clear end time; this only affects future scans and does not change earlier records. Restart `start.cmd` after updating so the database gains the optional end-time column automatically; existing data is retained.
 
 The firmware probes the configured LCD address once at startup. With no LCD attached, it skips LCD initialization and writes, and continues scanning with Serial Monitor output. Power off before adding the LCD, then restart to detect it. No firmware change is needed when using the documented pins and configured address. Re-upload the updated sketch for this behavior and the `Class ended` display. This does not fix a separate `Check server` network/token error; consult the HTTP code in Serial Monitor.
+
+### Class/session context and scanner selection
+
+Teacher workspace endpoints accept `class_id` and `session_id` query parameters (or form fields). They must refer to a matching class/session; omitted values retain the default class/session for old links. Navigation, GET filters, downloads, and POST actions preserve the selected context. A student uses the same signed card across classes; enrollment and eligibility are verified against the target class.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/classes` | Class roster, enrollment and session management |
+| POST | `/classes` | Create a class with an empty roster and a Daily session |
+| POST | `/classes/sessions` | Add a named session to the selected class |
+| POST | `/classes/enroll` | Enroll an existing student in the selected class from today |
+| POST | `/scanner/session` | Select a scheduled, unfinalized session for today |
+
+All new endpoints require administrator authentication; POSTs require CSRF. Scanner endpoints keep the existing device-token protocol and use the persisted selection, independent of browser context. A missing/expired target returns HTTP 422 with `Select a session`; a valid card outside the target roster returns HTTP 403 with `Not in this class`. Duplicate detection uses student/session/date. Selection revisions prevent an in-flight frame from landing in a newly selected session and prevent the five-second cooldown from suppressing the first scan after switching sessions.
+
+Absence totals and overrides apply to one class and combine its finalized session absences. CSV filenames include class/session IDs. Upgrade version 1 rebuilds scoped tables in a transaction and checks foreign keys before commit. Existing card secrets and historical records stay intact. Populated non-test databases receive a `.pre-classes.bak` SQLite backup before the class/session migration.

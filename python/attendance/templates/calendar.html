@@ -1,0 +1,15 @@
+{% extends "workspace.html" %}
+{% block title %}Calendar · QR Attendance{% endblock %}
+{% block workspace_content %}
+<header class="dashboard-heading"><div><h1>Session calendar</h1><p>{{ current_class[1] }} / {{ current_session[2] }} — choose a day to review attendance and corrections.</p></div></header>
+<div class="dashboard-toolbar">
+  <div class="month-navigation">{% if previous %}<a class="button button-secondary" href="{{ url_for('web.calendar_page', month=previous) }}" aria-label="Previous month">Previous</a>{% endif %}<h2>{{ month_label }}</h2>{% if following %}<a class="button button-secondary" href="{{ url_for('web.calendar_page', month=following) }}" aria-label="Next month">Next</a>{% endif %}</div>
+  <form class="date-filter" method="get"><input type="hidden" name="class_id" value="{{ class_id }}"><input type="hidden" name="session_id" value="{{ session_id }}"><label for="month">Jump to month<input id="month" type="month" name="month" value="{{ month }}" required></label><button class="button button-secondary" type="submit">Go</button></form>
+</div>
+<div class="calendar-scroll" tabindex="0" role="region" aria-label="Monthly class calendar">
+<table class="class-calendar"><caption class="sr-only">{{ month_label }} class schedules</caption><thead><tr>{% for label in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}<th scope="col">{{ label }}</th>{% endfor %}</tr></thead><tbody>
+{% for week in weeks %}<tr>{% for number in week %}<td>{% if number %}{% set date = month ~ '-%02d'|format(number) %}{% set info = schedules.get(date) %}<a class="calendar-day {{ 'has-class' if info else '' }}" href="{{ url_for('web.day_attendance', day=date) }}"><span class="calendar-number">{{ number }}</span>{% if info %}<strong>{{ info[0] }}–{{ info[1] or 'No end' }}</strong><span>{{ info[3] }} records</span><span class="badge {{ 'badge-success' if info[2] else 'badge-neutral' }}">{{ 'Finalized' if info[2] else 'Needs review' }}</span>{% else %}<span>No class set</span>{% endif %}</a>{% endif %}</td>{% endfor %}</tr>{% endfor %}
+</tbody></table>
+</div>
+<p class="hint">Times use Philippine time (UTC+08:00). Only finalized absences count toward dropping a student.</p>
+{% endblock %}

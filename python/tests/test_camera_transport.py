@@ -23,6 +23,7 @@ class CameraTransportTests(unittest.TestCase):
             with app.app_context(), get_db() as db:
                 from attendance.db import replace_card
                 db.execute("INSERT INTO students VALUES ('HTTP-1', 'HTTP Student')")
+                db.execute("INSERT INTO enrollment(student_id,joined_on) VALUES ('HTTP-1','2000-01-01')")
                 replace_card("HTTP-1")
                 db.execute("INSERT INTO class_schedule(day, start_time) VALUES (?, '00:00')",
                            (datetime.now(PH).date().isoformat(),))

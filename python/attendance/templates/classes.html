@@ -1,0 +1,27 @@
+{% extends "workspace.html" %}
+{% block title %}Classes & sessions · QR Attendance{% endblock %}
+{% block workspace_content %}
+<header class="dashboard-heading"><div><h1>Classes &amp; sessions</h1><p>Separate rosters for each class. Separate attendance for each session.</p></div></header>
+<div class="class-management">
+  <section class="panel" aria-labelledby="roster-heading">
+    <div class="panel-heading"><div><h2 id="roster-heading">{{ current_class[1] }} roster</h2><p>{{ members|length }} enrolled students · shared across this class’s sessions</p></div><a class="text-link" href="{{ url_for('web.students_page') }}#register-student">Register a new student</a></div>
+    <div class="management-content">
+      {% if available %}<form method="post" action="{{ url_for('web.enroll_student') }}" class="enrollment-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <div class="context-field"><label for="existing-student">Enroll an existing student</label><select id="existing-student" name="student_id" required><option value="">Choose a student</option>{% for id,name in available %}<option value="{{ id }}">{{ name }} ({{ id }})</option>{% endfor %}</select></div>
+        <button class="button button-primary" type="submit">Enroll in this class</button>
+      </form><p class="hint">Enrollment starts today. Keep using the student’s current QR card; their other classes stay unchanged.</p>
+      {% else %}<p class="hint">{% if members %}All registered students are already in this class.{% else %}No students available to enroll. Register a student to start this roster.{% endif %}</p>{% endif %}
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Class roster"><table><thead><tr><th scope="col">Student</th><th scope="col">Student ID</th></tr></thead><tbody>{% for id,name in members %}<tr><td>{{ name }}</td><td>{{ id }}</td></tr>{% else %}<tr><td colspan="2">No students enrolled in this class yet.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+  <div class="management-column">
+    <section class="panel" aria-labelledby="sessions-heading"><div class="panel-heading"><div><h2 id="sessions-heading">Sessions in this class</h2><p>For example, Morning and Afternoon.</p></div></div><div class="management-content">
+      <ul class="session-list">{% for id,name in sessions %}<li><span>{{ name }}</span><a class="text-link" href="{{ url_for('web.dashboard', class_id=class_id, session_id=id) }}">Set hours &amp; attendance</a></li>{% endfor %}</ul>
+      <form method="post" action="{{ url_for('web.create_session') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><label for="session-name">New session name<input id="session-name" name="name" maxlength="80" required placeholder="e.g. Afternoon"></label><button class="button button-secondary" type="submit">Add session</button></form>
+      <p class="hint">Each session has its own hours for each date, check-ins, review, and CSV. Finalized session absences count toward this class’s four-absence rule.</p>
+    </div></section>
+    <section class="panel" aria-labelledby="create-class-heading"><div class="panel-heading"><h2 id="create-class-heading">Create another class</h2></div><form class="management-content" method="post" action="{{ url_for('web.create_class') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><label for="class-name">Class name<input id="class-name" name="name" maxlength="80" required placeholder="e.g. Grade 10 — Mathematics"></label><button class="button button-primary" type="submit">Create class</button><p class="hint">A new class starts with an empty roster and one Daily session. Existing attendance stays in its original class.</p></form></section>
+  </div>
+</div>
+{% endblock %}

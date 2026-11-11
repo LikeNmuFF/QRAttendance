@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "components.html" import icon, brand %}
+{% block body_class %}dashboard-page{% endblock %}
+{% block layout %}
+<aside class="sidebar no-print">
+  {{ brand(url_for('web.landing'), true) }}
+  <div class="workspace-label">ADMINISTRATOR WORKSPACE</div>
+  <nav class="workspace-nav" aria-label="Workspace navigation">
+    {% for key, endpoint, label, symbol in [('attendance','web.dashboard','Attendance','grid'),('classes','web.classes_page','Classes & sessions','grid'),('calendar','web.calendar_page','Calendar','calendar'),('students','web.students_page','Students & QR cards','people'),('audit','web.audit_page','Absence audit','check')] %}
+    <a href="{{ url_for(endpoint) }}" {% if page == key %}class="nav-current" aria-current="page"{% endif %}>{{ icon(symbol) }} {{ label }}</a>
+    {% endfor %}
+  </nav>
+  <div class="sidebar-note">{{ icon('scan') }}<strong>A scan. A saved moment.</strong><p>Student cards connect your classroom to a clearer attendance record.</p></div>
+  <div class="sidebar-bottom"><a href="{{ url_for('web.landing') }}">{{ icon('home') }} Back to website</a><form method="post" action="{{ url_for('web.logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="sidebar-logout" type="submit">{{ icon('logout') }} Sign out</button></form></div>
+</aside>
+<main id="main" class="dashboard-main" {% block live_attributes %}{% endblock %}>
+  {% for message in get_flashed_messages() %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  <section class="workspace-context no-print" aria-label="Class and session">
+    <form method="get" action="{{ url_for('web.classes_page' if page == 'classes' else 'web.dashboard') }}">
+      <div class="context-field"><label for="workspace-class">Class</label><select id="workspace-class" name="class_id">{% for id,name in classes %}<option value="{{ id }}" {% if id == class_id %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></div>
+      <button class="button button-secondary" type="submit">Open class</button>
+    </form>
+    <form method="get" action="{{ url_for('web.classes_page' if page == 'classes' else 'web.dashboard') }}">
+      <input type="hidden" name="class_id" value="{{ class_id }}">
+      <div class="context-field"><label for="workspace-session">Session</label><select id="workspace-session" name="session_id">{% for id,name in sessions %}<option value="{{ id }}" {% if id == session_id %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></div>
+      <button class="button button-secondary" type="submit">Open session</button>
+    </form>
+    <p class="context-note">Viewing <strong>{{ current_class[1] }} / {{ current_session[2] }}</strong><span>Opening a page does not change the scanner.</span></p>
+  </section>
+  {% block workspace_content %}{% endblock %}
+</main>
+{% endblock %}

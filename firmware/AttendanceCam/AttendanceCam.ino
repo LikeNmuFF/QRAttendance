@@ -104,6 +104,7 @@ void reportFailure(int code) {
   if (code == -100) show("Camera stopped", "Check camera", 0, 2);
   else if (code == 401) show("Not saved", "Device token", 4, 2);
   else if (code == 403) show("Invalid QR card", "Use website card", 3, 2);
+  else if (code == 423) show("You are dropped", "See your teacher", 4, 2);
   else if (code == 422) show("Not saved", "Class time unset", 4, 2);
   else if (code == 425) show("Not saved", "Class not open", 4, 2);
   else if (code == 410) show("Not saved", "Class ended", 4, 2);

@@ -26,6 +26,7 @@ class StorageTests(unittest.TestCase):
             db = get_db()
             with db:
                 db.execute("INSERT INTO students VALUES (?,?)", ("2026-001", "Test Student"))
+                db.execute("INSERT INTO enrollment(student_id,joined_on) VALUES ('2026-001','2000-01-01')")
                 replace_card("2026-001")
                 db.execute("INSERT INTO class_schedule(day, start_time) VALUES (?,?)", (datetime.now(PH).date().isoformat(), "00:00"))
 
@@ -85,6 +86,7 @@ class StorageTests(unittest.TestCase):
                 sid = f"BOUNDARY-{index}"
                 with get_db() as db:
                     db.execute("INSERT INTO students VALUES (?,?)", (sid, "Boundary Student"))
+                    db.execute("INSERT INTO enrollment(student_id,joined_on) VALUES (?,'2000-01-01')", (sid,))
                     replace_card(sid)
                 clock.now.return_value = start + timedelta(seconds=seconds)
                 code, message = record(self.card(sid))

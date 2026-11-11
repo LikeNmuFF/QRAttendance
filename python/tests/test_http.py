@@ -99,14 +99,16 @@ class EndpointTests(unittest.TestCase):
     def test_all_routes_and_methods(self):
         self.assertEqual({rule.rule for rule in self.app.url_map.iter_rules()},
                          {"/", "/dashboard", "/login", "/logout", "/schedule", "/students", "/scan", "/report.csv", "/static/<path:filename>",
-                          "/students/<student_id>/print", "/students/<student_id>/qr.png", "/students/<student_id>/replace-qr", "/camera/frame"})
-        for path in ("/", "/dashboard", "/report.csv", "/static/style.css", "/static/app.js"):
+                          "/students/<student_id>/print", "/students/<student_id>/qr.png", "/students/<student_id>/replace-qr", "/camera/frame",
+                          "/students/qrcodes.zip", "/students/cards.pdf", "/calendar", "/audit", "/attendance/<day>", "/attendance/<day>/finalize", "/attendance/<day>/correct", "/students/<student_id>/eligibility",
+                          "/classes", "/classes/sessions", "/classes/enroll", "/scanner/session"})
+        for path in ("/", "/dashboard", "/students", "/calendar", "/audit", "/report.csv", "/static/style.css", "/static/app.js"):
             with self.client.get(path, headers=self.admin) as response:
                 self.assertEqual(response.status_code, 200)
             with self.client.head(path, headers=self.admin) as response:
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.data, b"")
-        for method, path in (("get", "/scan"), ("get", "/students"), ("post", "/dashboard"),
+        for method, path in (("get", "/scan"), ("post", "/dashboard"),
                              ("post", "/report.csv"), ("post", "/static/style.css"), ("get", "/logout"), ("get", "/schedule")):
             response = getattr(self.client, method)(path)
             self.assertEqual(response.status_code, 405)
@@ -225,7 +227,7 @@ class EndpointTests(unittest.TestCase):
 
     def test_empty_dashboard_and_security_headers(self):
         response = self.client.get("/dashboard", headers=self.admin)
-        self.assertIn(b"No students registered yet", response.data)
+        self.assertIn(b"No students registered yet", self.client.get('/students').data)
         self.assertIn(b"No check-ins for this date", response.data)
         self.assertEqual(response.headers["Cache-Control"], "no-store")
         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
@@ -380,7 +382,7 @@ class EndpointTests(unittest.TestCase):
         report = self.client.get("/report.csv", headers=self.admin)
         self.assertEqual(report.mimetype, "text/csv")
         self.assertTrue(report.data.startswith(b"\xef\xbb\xbf"))
-        self.assertIn(f'attendance-{self.today}.csv', report.headers["Content-Disposition"])
+        self.assertIn(f'attendance-class-1-session-1-{self.today}.csv', report.headers["Content-Disposition"])
         rows = list(csv.reader(io.StringIO(report.data.decode("utf-8-sig"))))
         self.assertEqual(rows[1][1], "'=HYPERLINK(\"bad\")")
         self.assertEqual(rows[1][2], self.today)

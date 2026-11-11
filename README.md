@@ -13,9 +13,13 @@ An AI-Thinker ESP32-CAM captures QR cards and sends JPEG frames over local Wi-Fi
 ## Features
 
 - Student registration, printable signed QR cards, and lost-card replacement that revokes old copies.
-- One check-in per student per Philippine calendar day, with Present, Late, or Absent status.
+- Print-ready A4 PDF sheets for selected students or everyone, with names, signed QR codes, IDs, and an editable message; individual PDF/PNG downloads are also available.
+- Multiple classes with separate rosters and multiple sessions per class on the same day.
+- One check-in per student per session per Philippine calendar day, with Present, Late, or Absent status.
 - Daily start time and optional end time.
 - Live camera preview, automatic attendance updates, and CSV export.
+- Separate Attendance, Students & QR cards, Calendar, and Absence audit pages.
+- Teacher-reviewed daily rosters, corrections with reasons, and fourth-absence QR blocking with teacher overrides.
 - Offline operation once dependencies are installed; a reachable local Wi-Fi network is still required.
 
 ## How it works
@@ -155,7 +159,34 @@ flowchart TD
     Save --> Success["Green LED and track 1"]
 ```
 
-Blank end time means no cutoff. Start locks after the first check-in; end can still be changed or cleared for future scans. Existing records stay unchanged. Duplicates confirm **Already recorded**, even after class ends. Students who never scan are not automatically marked absent.
+Blank end time means no cutoff. Start locks after the first check-in; end can still be changed or cleared until the teacher finalizes that day. Finalization locks both hours and closes scanning for the date.
+
+### Multiple classes and sessions
+
+1. Restart the server with `start.cmd`.
+2. Open **Classes & sessions** and create a class. New classes start with an empty roster and a **Daily session**.
+3. Register new students from **Students & QR cards**, or enroll an existing student from **Classes & sessions**. One student can belong to several classes and keeps the same QR card.
+4. Add sessions such as **Morning** and **Afternoon**. Use the **Class** and **Session** selectors to open the desired workspace.
+5. In **Attendance**, choose the date and save session hours. For today, choose **Use [session] for scanning** before students scan.
+6. Review/finalize each session separately from **Calendar**. CSV exports, corrections, and live records use the selected session; absence audits combine that class's sessions.
+
+Browsing another class or session does not switch the scanner. The selection is shared across browser tabs, persists across server restarts, and expires when the date changes. Creating a second class/session clears the original automatic default; choose a session explicitly. The original single-session workflow keeps working until then. No new firmware upload or QR reprint is required for classes/sessions.
+
+On first startup, the upgrade moves the existing register into **Default class / Daily session**, preserving students, schedules, attendance, corrections, teacher decisions, and QR secrets. A populated database gets a one-time `python/attendance.db.pre-classes.bak` recovery copy before the class/session migration. Keep it private. To roll back, stop the server and restore that copy together with the earlier application version.
+
+### Calendar, teacher review, and dropped students
+
+Open **Calendar** and click a date to see the class start/end hours, student roster, recorded scan times, and corrections. Set the day's hours from its Attendance link. After class, review the roster and choose **Finalize attendance**. Missing enrolled students become absent. Today's class requires an end time that has passed; previous dates can be finalized with an optional end time. Future dates cannot be finalized. Finalization is explicit; merely viewing a day never adds absences.
+
+On **Students & QR cards**, select rows and choose **Download selected PDF**, or choose **Download all PDF**. One A4 PDF contains six cards per sheet, each with the student's name, current signed QR code, ID, and the editable **Message on each card** (up to 80 characters). Print on A4 at **100% / Actual size**, then cut along the light outlines. Long names and IDs wrap inside the card. Use a row's **Download PDF** for one card; individual PNG downloads and the print-preview page remain available. The default message is "Present this code at the attendance scanner."
+
+**Select visible students** follows the current search; previously checked students remain selected when hidden by a new search. Downloads preserve existing credentials and dropped status. The earlier ZIP endpoint remains available at `/students/qrcodes.zip`. These web download controls need no firmware update. ReportLab and its dependency are bundled in `offline/wheels`; rerun the offline installer on another PC before starting this version.
+
+Only absences on finalized days count toward the drop rule. On the **fourth** confirmed absence, QR scanning is blocked. The scanner returns HTTP 423; the updated firmware displays **You are dropped** / **See your teacher**, with the red LED and existing failure audio track 4. Reflash the ESP32-CAM to enable this LCD message.
+
+In **Absence audit**, teachers can inspect totals and individual history, **give another chance** to allow scanning, explicitly **drop** a student, or **apply the four-absence rule** again. A chance remains in effect until the teacher changes it. Decisions require a reason and preserve absence totals. Corrections support Present, Late, Absent, or Excused; reasons and old/new statuses are saved. Excused does not count as absent. Correcting a total below four restores scanning unless the teacher explicitly dropped the student.
+
+The existing administrator login manages all classes. Absence totals combine finalized sessions **within each class**, with no automatic semester/month reset. Each missed finalized session counts once; two missed sessions on one date count as two absences. Drop decisions and teacher chances affect only the selected class. New students are eligible from their enrollment date in that class. For existing databases, enrollment starts at the earliest saved attendance date, or the upgrade date if no attendance exists; earlier enrollment dates cannot be inferred. Existing attendance is preserved, including its finalized or provisional review state. Dropped students keep their history and valid card credentials so a teacher can restore access without reprinting.
 
 Remove the card after its result. A five-second same-card cooldown suppresses repeated frame events; another student's card can be processed immediately.
 
@@ -183,7 +214,7 @@ node python/tests/test_dashboard_live.cjs
 node python/tests/test_camera_preview.cjs
 ```
 
-The latest recorded application checks passed **48 Python tests**, dashboard JavaScript checks, and AI-Thinker compilation on ESP32 core 3.2.0. These do not certify physical wiring or scan performance. See [AUDIT.md](AUDIT.md) for verification and limitations.
+The class/session, calendar, teacher-audit, and QR-download changes pass **82 Python tests**, dashboard JavaScript checks, and desktop/mobile Chromium checks for navigation, PDF downloads, teacher chances, and day finalization. PDF rendering checks verified pagination, accented/long names, long IDs, and QR decoding from all seven rendered sample cards. The updated firmware compiles for AI Thinker ESP32-CAM on core 3.2.0 (1,043,662 bytes program storage; 55,844 bytes globals). These do not certify physical wiring or scan performance. See [AUDIT.md](AUDIT.md) for earlier hardware verification and limitations.
 
 | Location | Purpose |
 |---|---|
@@ -198,6 +229,6 @@ The latest recorded application checks passed **48 Python tests**, dashboard Jav
 
 Use a **trusted LAN**. Plain HTTP does not encrypt passwords, sessions, frames, or device tokens. Do not expose port 5000 to the internet. Keep local configuration and database backups private.
 
-There is one daily check-in per student, no check-out, no offline queue, and no individual teacher accounts. Signed QR cards prevent altered credentials, but an exact copy of a valid card still works. Supervise scanning when identity matters.
+There is one check-in per student per session per date, no check-out, no offline queue, and no individual teacher accounts. The shared scanner records into one selected session at a time. Signed QR cards prevent altered credentials, but an exact copy of a valid card still works. Supervise scanning when identity matters.
 
 This README uses repository-hosted GIFs and [GitHub-native Mermaid blocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams); no JavaScript embed is needed.

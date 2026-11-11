@@ -1,4 +1,4 @@
-﻿# QR Attendance interface
+# QR Attendance interface
 
 ## Direction
 
@@ -8,10 +8,11 @@ A dark, futuristic attendance workspace chosen by the user. Deep navy surfaces, 
 
 - `/` is a public product landing page; it never queries or exposes student data.
 - `/dashboard` is the signed-in workspace. `/login` and `/logout` handle administrator access.
-- Sidebar links navigate to real page sections; reports download from the existing CSV endpoint.
+- Sidebar links include Classes & sessions (`/classes`) and navigate to Attendance (`/dashboard`), Students & QR cards (`/students`), Calendar (`/calendar`), and Absence audit (`/audit`). Daily review pages (`/attendance/YYYY-MM-DD`) show class hours, the eligible roster, scan times, and teacher corrections. Reports download from the existing CSV endpoint.
 - Counts come from the selected date and real database records. They are not sample metrics.
 - The landing scanner and sample student card are explicitly illustrative. They do not report connection status or live scans, and the decorative QR is not a student registration.
-- Attendance rules remain unchanged: not open before start, Present under 15 minutes, Late from 15 to under 40 minutes, Absent at 40 minutes or more. One start time/check-in per student per day.
+- Attendance rules remain unchanged: not open before start, Present under 15 minutes, Late from 15 to under 40 minutes, Absent at 40 minutes or more. One start time/check-in per student per session per day. Classes have separate rosters; all sessions in a class share its roster.
+- A teacher explicitly finalizes completed class days to mark missing eligible students absent. Only finalized session absences count toward the four-absence drop rule within the selected class. Teachers can grant a chance, explicitly drop a student, or restore the default rule; every decision requires a saved reason. Historical records and corrections remain visible.
 
 ## Visual tokens
 

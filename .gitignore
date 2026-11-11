@@ -1,3 +1,8 @@
 attandance.db
 instance/*
 tests/*
+__pycache__/
+.audit/build-drop/
+.audit/new-*.png
+.audit/new-*.pdf
+*.pre-classes.bak

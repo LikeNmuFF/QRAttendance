@@ -107,10 +107,10 @@ if (liveDashboard) {
         if (current.innerHTML !== incoming.innerHTML) current.replaceChildren(...incoming.childNodes);
       }
       const search = document.getElementById('attendance-search');
-      search.dispatchEvent(new Event('input'));
+      search?.dispatchEvent(new Event('input'));
       const scheduleInput = document.getElementById('start-time');
       const incomingSchedule = page.querySelector('#start-time');
-      if (incomingSchedule?.readOnly) {
+      if (scheduleInput && incomingSchedule?.readOnly) {
         scheduleInput.value = incomingSchedule.value;
         scheduleInput.readOnly = true;
       }
@@ -223,4 +223,39 @@ if (cameraPanel) {
     } else poll();
   });
   window.addEventListener('pagehide', () => stop());
+}
+
+// Bulk downloads keep individual selection usable without JavaScript.
+const qrDownload = document.querySelector('[data-qr-download]');
+if (qrDownload) {
+  const selectVisible = qrDownload.querySelector('[data-select-visible]');
+  qrDownload.querySelectorAll('[data-individual-pdf]').forEach(link => {
+    link.addEventListener('click', () => {
+      const target = new URL(link.href);
+      target.searchParams.set('message', document.getElementById('card-message').value);
+      link.href = target.href;
+    });
+  });
+  const boxes = () => [...qrDownload.querySelectorAll('input[name="student_id"]')];
+  const visibleBoxes = () => boxes().filter(box => !box.closest('[data-search-row]').hidden);
+  const updateSelection = () => {
+    const visible = visibleBoxes();
+    const selected = visible.filter(box => box.checked).length;
+    selectVisible.checked = visible.length > 0 && selected === visible.length;
+    selectVisible.indeterminate = selected > 0 && selected < visible.length;
+  };
+  selectVisible.addEventListener('change', () => {
+    visibleBoxes().forEach(box => { box.checked = selectVisible.checked; });
+    updateSelection();
+  });
+  boxes().forEach(box => box.addEventListener('change', updateSelection));
+  document.getElementById('student-search').addEventListener('input', updateSelection);
+  qrDownload.addEventListener('submit', event => {
+    if (event.submitter?.value === 'selected' && !boxes().some(box => box.checked)) {
+      event.preventDefault();
+      selectVisible.setCustomValidity('Select at least one student to download.');
+      selectVisible.reportValidity();
+      selectVisible.setCustomValidity('');
+    }
+  });
 }

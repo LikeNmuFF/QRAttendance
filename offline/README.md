@@ -1,6 +1,6 @@
 ﻿# Run QR Attendance without internet
 
-This folder contains all 13 pinned runtime dependency wheels, including OpenCV and NumPy for laptop QR decoding. It supports **64-bit Windows with Python 3.13**. Python itself must already be installed; a Python installer is not included. Other operating systems or Python versions require matching dependency wheels.
+This folder contains all 15 pinned runtime dependency wheels, including OpenCV and NumPy for laptop QR decoding and ReportLab for printable PDF card sheets. It supports **64-bit Windows with Python 3.13**. Python itself must already be installed; a Python installer is not included. Other operating systems or Python versions require matching dependency wheels.
 
 ## On this computer
 
