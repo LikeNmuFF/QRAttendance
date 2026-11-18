@@ -102,12 +102,12 @@ Unauthenticated dashboard, report and card requests redirect to `/login`. Flask 
 
 | Status | Meaning | Scanner behavior |
 |---|---|---|
-| 201 | Two lines: `Present`, `Late` or `Absent`, then the LCD-safe student name | Name on LCD row 1, status on row 2; track 1 |
+| 201 | Two lines: `Present`, `Late` or `Absent`, then the LCD-safe student name | Present: green/track 1; Late: yellow/track 5; Absent: red/track 6 |
 | 409 | Two lines: `Already recorded`, then the LCD-safe student name | Name on row 1, duplicate on row 2; track 2 |
 | 403 | Invalid, unsigned, forged or revoked QR credential | Invalid QR card; ask your teacher; track 3 |
-| 422 | Class time not set for today | Not saved; class time unset; track 4 |
-| 425 | Class has not started | Not saved; class not open; track 4 |
-| 410 | Class has ended | Not saved; class ended; red light and track 4 |
+| 422 | Class time not set for today | Not saved; class time unset; track 10 |
+| 425 | Class has not started | Not saved; class not open; track 8 |
+| 410 | Class has ended | Not saved; class ended; red light and track 9 |
 | 400 | Empty/oversized body or invalid UTF-8 | Generic failure; track 4 |
 | 401 | Missing or wrong device token | Device-token error; track 4 |
 | 415 / 413 | Wrong media type / application request too large | Generic failure; track 4 |
@@ -181,16 +181,12 @@ Do not connect the adapter's 5V UART signals to U0R/U0T. Avoid powering the boar
 
 ## DFPlayer audio
 
-Use your **1K** resistor between **GPIO2 and DFPlayer RX**. Power DFPlayer VCC from the regulated 5 V rail and connect GND to common ground. Leave TX unconnected. Connect the speaker only across SPK1/SPK2. Use two **330R** resistors for the separate LEDs and a separate **10K** pull-down from GPIO12 to GND. See the [detailed DFPlayer and resistor instructions](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
+Use your **1K** resistor between **GPIO2 and DFPlayer RX**. Power DFPlayer VCC from the regulated 5 V rail and connect GND to common ground. Leave TX unconnected. Connect the speaker only across SPK1/SPK2. Use three **330R** resistors for the separate LEDs and a separate **10K** pull-down from GPIO12 to GND. See the [detailed DFPlayer and resistor instructions](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
 
-Supply actual recordings on a supported FAT-formatted microSD card in the DFPlayer. Audio files are not included.
-
-| Card file | Message |
-|---|---|
-| `/mp3/0001.mp3` | Attendance recorded |
-| `/mp3/0002.mp3` | Attendance already recorded |
-| `/mp3/0003.mp3` | Invalid or replaced QR card |
-| `/mp3/0004.mp3` | Attendance not saved; please try again later |
+Use a supported FAT16/FAT32 card (up to 32 GB) in the DFPlayer. Copy the `mp3`
+folder from [the 14-track male audio ZIP](audio/dfplayer-male-14-sd-card.zip).
+The [complete track table](firmware/AttendanceCam/README.md#prepare-the-audio-card)
+lists 0001 through 0014. Upload the updated firmware once to enable all fourteen events.
 
 Firmware uses `playMp3Folder()` and volume 22 of 30. Commands are TX-only (GPIO2 -> 1 kOhm -> DFPlayer RX), with no UART acknowledgment. Leave DFPlayer TX unconnected. Missing audio does not prevent recording, and the firmware cannot verify playback/card presence. Test each track physically before deployment.
 
@@ -213,14 +209,19 @@ The ESP32 captures native VGA (640 x 480) JPEG frames with two PSRAM buffers and
 
 | Result | LCD | Audio | Light |
 |---|---|---|---|
-| Newly saved attendance | Student name, then Present/Late/Absent | Track 1 | Green |
-| Already recorded | Student name, then Already recorded | Track 2 | Red |
-| Invalid/revoked/unsupported card | Invalid QR card | Track 3 | Red |
-| Unset class time, class not started/ended, connection/server error | Not saved + reason | Track 4 (busy errors stay quiet) | Red |
-| QR pattern detected but unreadable | Unreadable QR / Hold card steady | None | Red |
-| No QR visible | Ready to scan | None | Off |
+| Present saved | Name + Present | 0001 | Green (GPIO12) |
+| Late saved | Name + Late | 0005 | Yellow (GPIO4) + white flash |
+| Absent saved | Name + Absent | 0006 | Red (GPIO15) |
+| Duplicate / invalid | Already recorded / Invalid QR | 0002 / 0003 | Red |
+| Other events | Reason on LCD | 0004 and 0007–0014 per firmware table | Red for errors |
 
-Lights normally stay on about 2.5 seconds. Green confirms a database save, including a saved Late or Absent status; it does not imply the student was on time. A five-second same-card cooldown prevents per-frame repeated database/audio events. Remove a card after its result. Different students can scan immediately. The supported hardware is two separate LEDs; never connect LEDs without series resistors. The white onboard flash is not used.
+Three ordinary two-lead LEDs are supported, each with its own 330 Ohm resistor and
+cathode to GND. GPIO12 also needs its 10 kOhm pull-down. Yellow intentionally shares
+GPIO4 with the white flash. Indicators last about 2.5 seconds; fatal camera/PSRAM
+initialization holds red on. Same-error and unreadable-QR audio are limited to once
+per 10 seconds; offline Wi-Fi is announced after 15 seconds and every 15 seconds
+thereafter. Ready (0014) plays once on the first Wi-Fi connection, not on every idle
+loop, and does not verify the server. See the [full behavior table](firmware/AttendanceCam/README.md#11-expected-output-behavior).
 
 ## Live scanner camera preview
 
@@ -274,7 +275,7 @@ For an 08:00 start, 08:14:59 is Present; 08:15 through 08:39:59 is Late; 08:40 a
 
 Existing databases are upgraded without deleting records. Earlier attendance without a schedule is shown as **Not assessed** rather than being retroactively labeled late. An initial class time can still be set for a date containing these legacy records; their original status stays unchanged.
 
-**Upload the updated `.ino` again and reprint all old plain-ID QR cards.** The firmware now accepts signed credentials and displays the student name above Present/Late/Absent. Track 1 remains the generic attendance-recorded audio for all saved outcomes; no new audio file is required. Firmware compilation passed; physical testing remains outstanding. See AUDIT.md for verification details.
+**Upload the updated `.ino` again and reprint all old plain-ID QR cards.** The firmware now accepts signed credentials and displays the student name above Present/Late/Absent. The firmware now selects Present/Late/Absent recordings separately (0001/0005/0006); copy the 14-track audio set to the DFPlayer card. Firmware compilation passed; physical testing remains outstanding. See AUDIT.md for verification details.
 
 ## Signed cards and lost-card replacement
 

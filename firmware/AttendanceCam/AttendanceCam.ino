@@ -20,16 +20,18 @@ void writeLCD(String first, String second) {
   lcd.setCursor(0, 1); lcd.print(second.substring(0, 16));
 }
 
-void lights(bool success) {
-  digitalWrite(LED_GREEN, success ? HIGH : LOW);
-  digitalWrite(LED_RED, success ? LOW : HIGH);
+// Indicator values: 1 = Present, 2 = Absent/error, 3 = Late.
+void lights(int indicator) {
+  digitalWrite(LED_GREEN, indicator == 1 ? HIGH : LOW);
+  digitalWrite(LED_RED, indicator == 2 ? HIGH : LOW);
+  digitalWrite(LED_YELLOW, indicator == 3 ? HIGH : LOW);
   lightsUntil = millis() + 2500;
 }
 void show(String first, String second, int track = 0, int indicator = 0) {
   writeLCD(first, second);
   Serial.println(first + ": " + second);
   if (track) audio.playMp3Folder(track);
-  if (indicator) lights(indicator == 1);
+  if (indicator) lights(indicator);
   resetAt = millis() + 3000;
 }
 
@@ -97,17 +99,18 @@ bool setupCamera() {
 void reportFailure(int code) {
   static int previousCode = 0;
   static unsigned long reportedAt = 0;
-  if (code == previousCode && millis() - reportedAt < 5000) return;
+  if (code == previousCode && millis() - reportedAt < 10000) return;
   previousCode = code; reportedAt = millis();
   Serial.printf("Camera upload/attendance failed: HTTP %d.\n", code);
   if (code < 0 && code != -100) Serial.println("Connection error: " + HTTPClient::errorToString(code));
-  if (code == -100) show("Camera stopped", "Check camera", 0, 2);
+  if (code == -100) show("Camera stopped", "Check camera", 13, 2);
+  else if (code < 0) show("Not saved", "Check connection", 12, 2);
   else if (code == 401) show("Not saved", "Device token", 4, 2);
   else if (code == 403) show("Invalid QR card", "Use website card", 3, 2);
-  else if (code == 423) show("You are dropped", "See your teacher", 4, 2);
-  else if (code == 422) show("Not saved", "Class time unset", 4, 2);
-  else if (code == 425) show("Not saved", "Class not open", 4, 2);
-  else if (code == 410) show("Not saved", "Class ended", 4, 2);
+  else if (code == 423) show("You are dropped", "See your teacher", 7, 2);
+  else if (code == 422) show("Not saved", "Class time unset", 10, 2);
+  else if (code == 425) show("Not saved", "Class not open", 8, 2);
+  else if (code == 410) show("Not saved", "Class ended", 9, 2);
   else if (code == 413) show("Not saved", "Image too large", 4, 2);
   else if (code == 200 || code == 404) show("Not saved", "Update server", 4, 2);
   else if (code == 429) show("Not saved", "Server busy", 0, 2);
@@ -141,9 +144,9 @@ void sendFrame() {
   http.end();
   if (code == 204) {
     static unsigned long warningAt = 0;
-    if (state == "decode_failed" && !resetAt && (!warningAt || millis() - warningAt >= 3000)) {
+    if (state == "decode_failed" && !resetAt && (!warningAt || millis() - warningAt >= 10000)) {
       warningAt = millis();
-      show("Unreadable QR", "Hold card steady", 0, 2);
+      show("Unreadable QR", "Hold card steady", 11, 2);
     }
     return;
   }
@@ -155,7 +158,9 @@ void sendFrame() {
     if (name[i] < 32 || name[i] > 126) validName = false;
   if (code == 201 && validName && (status == "Present" || status == "Late" || status == "Absent")) {
     Serial.println("Attendance saved by laptop.");
-    show(name, status, 1, 1);
+    if (status == "Present") show(name, status, 1, 1);
+    else if (status == "Late") show(name, status, 5, 3);
+    else show(name, status, 6, 2);
   } else if (code == 409 && validName && status == "Already recorded") {
     show(name, "Already recorded", 2, 2);
   } else reportFailure(code);
@@ -163,8 +168,8 @@ void sendFrame() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(LED_GREEN, OUTPUT); pinMode(LED_RED, OUTPUT);
-  digitalWrite(LED_GREEN, LOW); digitalWrite(LED_RED, LOW);
+  pinMode(LED_GREEN, OUTPUT); pinMode(LED_RED, OUTPUT); pinMode(LED_YELLOW, OUTPUT);
+  digitalWrite(LED_GREEN, LOW); digitalWrite(LED_RED, LOW); digitalWrite(LED_YELLOW, LOW);
   Wire.begin(LCD_SDA, LCD_SCL); Wire.setTimeOut(100);
   Wire.beginTransmission(LCD_ADDRESS);
   lcdReady = Wire.endTransmission() == 0;
@@ -174,32 +179,44 @@ void setup() {
   // TX-only: DFPlayer TX must be disconnected; GPIO15 is the red indicator.
   audioSerial.begin(9600, SERIAL_8N1, -1, MP3_TX);
   audio.begin(audioSerial, false, false);
+  // Allow the DFPlayer to mount its card before volume or fatal-error playback.
+  delay(1200);
   audio.volume(MP3_VOLUME);
   Serial.println("DFPlayer TX-only enabled; card and playback cannot be verified over UART.");
   if (!psramFound()) {
-    show("Camera stopped", "PSRAM required", 0, 2);
+    show("Camera stopped", "PSRAM required", 13, 2);
     while (true) delay(1000);
   }
   startWiFi();
   if (!setupCamera()) {
-    show("Camera stopped", "Check camera/RAM", 0, 2);
+    show("Camera stopped", "Check camera/RAM", 13, 2);
     while (true) delay(1000);
   }
   show("Ready to scan", "Connecting WiFi");
 }
 void loop() {
   static wl_status_t previousWiFi = WL_NO_SHIELD;
+  static unsigned long offlineAt = millis();
+  static bool readyAnnounced = false;
   wl_status_t currentWiFi = WiFi.status();
   if (currentWiFi != previousWiFi) {
     if (currentWiFi == WL_CONNECTED) {
       Serial.print("WiFi connected. ESP32 IP: "); Serial.println(WiFi.localIP());
       Serial.print("Attendance server: "); Serial.println(SERVER_URL);
-      show("Ready to scan", "WiFi connected");
-    } else show("Scanner offline", "Connecting WiFi", 0, 2);
+      show("Ready to scan", "WiFi connected", readyAnnounced ? 0 : 14);
+      readyAnnounced = true;
+    } else {
+      offlineAt = millis();
+      show("Scanner offline", "Connecting WiFi", 0, 2);
+    }
     previousWiFi = currentWiFi;
   }
+  if (currentWiFi != WL_CONNECTED && millis() - offlineAt >= 15000) {
+    offlineAt = millis();
+    show("Scanner offline", "Connecting WiFi", 12, 2);
+  }
   if (lightsUntil && (long)(millis() - lightsUntil) >= 0) {
-    digitalWrite(LED_GREEN, LOW); digitalWrite(LED_RED, LOW); lightsUntil = 0;
+    digitalWrite(LED_GREEN, LOW); digitalWrite(LED_RED, LOW); digitalWrite(LED_YELLOW, LOW); lightsUntil = 0;
   }
   if (resetAt && (long)(millis() - resetAt) >= 0) {
     resetAt = 0;

@@ -1,6 +1,6 @@
 # ESP32-CAM attendance scanner: detailed wiring and assembly
 
-This guide matches the current [AttendanceCam.ino](AttendanceCam.ino) and [config.h](config.h). It covers the AI-Thinker ESP32-CAM with an OV3660 camera, a 16x2 I2C LCD, DFPlayer Mini and speaker, and two separate status LEDs.
+This guide matches the current [AttendanceCam.ino](AttendanceCam.ino) and [config.h](config.h). It covers the AI-Thinker ESP32-CAM with an OV3660 camera, a 16x2 I2C LCD, DFPlayer Mini and speaker, and three separate status LEDs.
 
 You can continue testing with only the ESP32-CAM. Add the components later using these assignments; the current firmware already sends their commands. A different LCD address or different pin assignment requires changing `config.h` and uploading again.
 
@@ -18,8 +18,8 @@ For an overview, open the [wiring diagram](../../hardware-wiring.svg). The [proj
 | 1 | DFRobot DFPlayer Mini DFR0299 or a verified compatible module | Pin layouts and clone behavior can differ. Identify pins from the module documentation. |
 | 1 | Passive speaker compatible with the exact DFPlayer speaker output | Connect directly across SPK1 and SPK2. Confirm the permitted speaker impedance and power in the module documentation. |
 | 1 | Supported microSD card for the DFPlayer | This card goes in the DFPlayer, not the ESP32-CAM. Prepare it as described below. |
-| 1 each | Separate green LED and red LED | This guide assumes ordinary two-lead LEDs, not a powered LED module. |
-| 2 | 330 Ohm resistors | One series resistor for each LED. Do not share one resistor between both LEDs. |
+| 1 each | Separate green, yellow and red LEDs | This guide assumes ordinary two-lead LEDs, not a powered LED module. |
+| 3 | 330 Ohm resistors | One independent series resistor for each LED. |
 | 1 | 1 kOhm resistor | Series resistor between ESP32 GPIO2 and DFPlayer RX. |
 | 1 | 10 kOhm resistor | Pull-down between GPIO12 and GND; separate from the green LED's series resistor. |
 | 1 | Stable regulated 5.0 V supply | A 5 V / 2 A supply is a starting point for this assembly; verify adequate power under camera, Wi-Fi and speaker load. |
@@ -39,7 +39,7 @@ For an overview, open the [wiring diagram](../../hardware-wiring.svg). The [proj
 - **DFPlayer TX stays unconnected.** Older wiring connected TX to GPIO15; remove that wire. GPIO15 is now the red LED output.
 - **GPIO12 must remain low during reset.** Use the green LED circuit and 10 kOhm pull-down below. Do not connect GPIO12 to 3.3 V or 5 V through an LED module or pull-up.
 - Keep the ESP32-CAM's onboard microSD slot empty. Its pins are being reused.
-- Do not substitute GPIO16 or GPIO17; the AI-Thinker board uses these for PSRAM. GPIO4 is intentionally unused to avoid switching the board's bright white flash.
+- Do not substitute GPIO16 or GPIO17; the AI-Thinker board uses these for PSRAM. GPIO4 drives the yellow Late LED and also switches the onboard white flash. This shared behavior is intentional.
 
 ## 3. Complete connection table
 
@@ -63,6 +63,7 @@ The table uses GPIO numbers, not physical header positions.
 | Green LED cathode (-) | Direct wire | Common GND |
 | ESP32 GPIO12 | **10 kOhm pull-down resistor** | Common GND |
 | ESP32 GPIO15 | **330 Ohm series resistor** | Red LED anode (+) |
+| ESP32 GPIO4 | **330 Ohm series resistor** | Yellow LED anode (+); cathode (-) to GND |
 | Red LED cathode (-) | Direct wire | Common GND |
 
 The shifter's channel labels may instead be `L1/H1`, `A1/B1`, or another naming scheme. Use the corresponding low/high pair for the same channel. Check its documentation before assuming which side is which.
@@ -155,31 +156,40 @@ The firmware sends UART commands at 9600 baud and uses volume **22 out of 30**. 
 
 Use a card and FAT16/FAT32 format supported by the exact DFPlayer module. Before formatting a card that contains other files, back up anything you want to keep; formatting erases it.
 
-Create an `mp3` folder at the card root and supply these actual MP3 recordings:
+Create an `mp3` folder at the card root with `0001.mp3` through `0014.mp3`.
+The generated male-voice recordings are in [audio/dfplayer-male-14](../../audio/dfplayer-male-14/),
+with a [ready-to-copy ZIP](../../audio/dfplayer-male-14-sd-card.zip).
+Upload the updated firmware once to enable this mapping. Replacing the spoken words later
+with new recordings under the same filenames does not require another firmware upload.
 
-```text
-microSD root/
-  mp3/
-    0001.mp3
-    0002.mp3
-    0003.mp3
-    0004.mp3
-```
-
-| File | Event | Suggested recording |
+| File | Event | Spoken message |
 |---|---|---|
-| `mp3/0001.mp3` | Attendance saved | "Attendance recorded." |
-| `mp3/0002.mp3` | Already recorded | "Your attendance is already recorded." |
-| `mp3/0003.mp3` | Invalid or revoked card | "Invalid QR card. Please ask your teacher." |
-| `mp3/0004.mp3` | Attendance not saved, including class ended/not started | "Attendance was not saved. Please try again." |
+| `mp3/0001.mp3` | Present | Your attendance has been recorded. You are present. |
+| `mp3/0002.mp3` | Already recorded | Your attendance has already been recorded. |
+| `mp3/0003.mp3` | Invalid QR card | Invalid QR card. Please use your official attendance QR card. |
+| `mp3/0004.mp3` | Saving failed | Your attendance could not be saved. Please try again or contact your instructor. |
+| `mp3/0005.mp3` | Late | Your attendance has been recorded. You are late. |
+| `mp3/0006.mp3` | Absent | Your attendance has been recorded as absent. Please speak with your instructor. |
+| `mp3/0007.mp3` | Dropped student | You are marked as dropped from this class. Please speak with your instructor. |
+| `mp3/0008.mp3` | Class not open | Attendance for this class is not open yet. Please wait. |
+| `mp3/0009.mp3` | Class ended | Attendance for this class has closed. Please speak with your instructor. |
+| `mp3/0010.mp3` | Class schedule missing | The class schedule has not been configured. Please contact your instructor. |
+| `mp3/0011.mp3` | Unreadable QR | Unable to read your QR card. Please hold it steady in front of the camera. |
+| `mp3/0012.mp3` | Connection problem | The scanner cannot connect to the attendance server. Please contact your instructor. |
+| `mp3/0013.mp3` | Camera failure | The camera could not start. Please contact your instructor. |
+| `mp3/0014.mp3` | Ready | The attendance scanner is ready. Please show your QR card. |
 
-Keep the four-digit filenames and `.mp3` extension. Check that Windows has not hidden an extra extension such as `0001.mp3.mp3`. Audio recordings are not included in this project. The ESP32-CAM's card slot is not used to play these files.
+Keep the four-digit names and real MP3 encoding; check for hidden duplicate extensions.
+Use a supported card of up to 32 GB, formatted FAT16/FAT32. Insert it into the DFPlayer,
+not the ESP32-CAM. Power off before inserting/removing it. Playback is TX-only and cannot
+be verified by the firmware. Startup waits 1.2 seconds for the card before sending volume
+and camera-failure audio commands; module/card variations still require bench testing.
 
 ### Test the DFPlayer after wiring
 
 1. With power off, check the 5 V supply, common GND, GPIO2 -> 1K -> RX connection, disconnected TX, speaker terminals and prepared microSD card.
 2. Power up the full assembly and start the laptop server. Set a class schedule that is currently open.
-3. Scan a current website-issued card for a student who has not checked in today. Confirm the saved row on the dashboard, green LED and `0001.mp3` playback.
+3. Scan a current website-issued card for a student who has not checked in today. Confirm the saved row on the dashboard, the correct status LED and playback: Present = green/0001, Late = yellow/0005, Absent = red/0006.
 4. Remove the card, wait more than five seconds, then scan again. Confirm Already recorded, red LED and `0002.mp3` playback. Rapid repeats are suppressed, so an immediate repeat may stay quiet.
 5. If attendance saves but there is no sound, check the card folder/filenames and actual MP3 content, the 1K resistor connection to RX, speaker wiring and power supply. A TX-only startup message is not proof that the module is working.
 
@@ -205,7 +215,7 @@ ESP32 GPIO12 ---- 330 Ohm ---- green LED anode (+)
 
 **The 10 kOhm resistor is a pull-down, not another series resistor in the LED branch.** It keeps the GPIO12 reset strap low. Never connect that resistor to VCC, and never replace this circuit with an LED module that pulls GPIO12 high at reset.
 
-GPIO12 going high after startup turns the green LED on. It means the server confirmed a newly saved attendance record. A saved Late or Absent result also lights green because the record was saved successfully.
+GPIO12 going high after startup turns the green LED on only for a newly saved Present result. Late uses yellow and Absent uses red.
 
 ## 8. Connect the red LED
 
@@ -219,6 +229,17 @@ ESP32 GPIO15 ---- 330 Ohm ---- red LED anode (+)
 3. Connect the red LED cathode to common GND.
 
 Do not share the green LED's resistor. Do not connect the red LED to GPIO4: that pin also operates the board's bright white flash and is not the configured red indicator.
+
+### Yellow Late LED (GPIO4)
+
+```text
+ESP32 GPIO4 ---- 330 Ohm ---- yellow LED anode (+)
+                            yellow LED cathode (-) ---- GND
+```
+
+Use a third independent resistor. GPIO4 also drives the built-in white flash, so both
+lights turn on for Late. This is the chosen pin arrangement, not a camera error.
+Do not use the onboard microSD slot, which shares these pins.
 
 GPIO15 is also a strapping pin. If the board fails to boot after adding external circuitry, power off and temporarily disconnect the external LED and DFPlayer signal wiring, then test the board alone. Do not change pins without updating the firmware and checking what the new pins are used for.
 
@@ -270,19 +291,30 @@ Move a card away after its result. The server suppresses rapid repeats of the sa
 
 | Situation | LCD / Serial result | Light | Audio |
 |---|---|---|---|
-| Newly saved attendance | Student name; Present, Late or Absent | Green, about 2.5 seconds | Track 1 |
-| Already recorded today | Student name; Already recorded | Red, about 2.5 seconds | Track 2 |
-| Invalid, revoked or unsupported card | Invalid QR card | Red | Track 3 |
-| Class start time missing | Not saved; Class time unset | Red | Track 4 |
-| Class has not started | Not saved; Class not open | Red | Track 4 |
-| Class has ended | Not saved; Class ended | Red | Track 4 |
-| HTTP connection/server/token failure | Not saved; relevant error | Red | Track 4; busy retries stay quiet |
-| Wi-Fi disconnected | Scanner offline; Connecting WiFi | Red when the state changes | No audio |
-| QR pattern found but unreadable | Unreadable QR; Hold card steady | Red when shown | No audio |
-| No card visible | Ready to scan / Aim student QR | Off after any prior indication expires | No audio |
-| Fatal camera/PSRAM initialization failure | Camera stopped | Red stays on | No audio |
+| Present saved | Student name; Present | Green | 0001 |
+| Late saved | Student name; Late | Yellow + onboard white flash | 0005 |
+| Absent saved | Student name; Absent | Red | 0006 |
+| Already recorded | Student name; Already recorded | Red | 0002 |
+| Invalid QR | Invalid QR card | Red | 0003 |
+| Dropped student | You are dropped | Red | 0007 |
+| Class time missing | Class time unset | Red | 0010 |
+| Before class starts | Class not open | Red | 0008 |
+| After class ends | Class ended | Red | 0009 |
+| Transport failure | Check connection | Red | 0012 |
+| Token, server or other save failure | Not saved + reason | Red | 0004 (HTTP 429 busy stays quiet) |
+| Wi-Fi unavailable for 15 seconds | Scanner offline | Red | 0012, at most every 15 seconds |
+| Unreadable QR pattern | Hold card steady | Red | 0011, at most every 10 seconds |
+| Fatal camera/PSRAM initialization failure | Camera stopped | Red stays on | 0013 |
+| First Wi-Fi connection after boot | Ready to scan | No status light requested | 0014, once per boot |
+| No QR detected | Ready to scan | Prior light expires | None |
 
-Unreadable-card messages are rate-limited and do not immediately overwrite a just-displayed scan result. Green confirms a saved database record, not a particular attendance status or verified audio playback.
+Ordinary indicators last about 2.5 seconds and are mutually exclusive. The same
+request failure is announced at most every 10 seconds. Fatal initialization stops
+scanning after sending 0013. A working DFPlayer/card/power supply is needed to hear it.
+Track 0014 means the camera initialized and Wi-Fi connected; it does not verify that
+the laptop server is running. Rapid repeated scans are suppressed by the server for
+five seconds. Different results can interrupt an earlier recording; move a card away
+after its result and let the announcement finish before scanning the next card.
 
 ## 12. Troubleshooting
 
@@ -295,9 +327,9 @@ Unreadable-card messages are rate-limited and do not immediately overwrite a jus
 | LCD displays blocks or inconsistent characters | Check contrast, I2C address, SDA/SCL assignment, loose wires, shared ground and voltage levels. |
 | No sound although a record is saved | Confirm supported card format, `mp3/0001.mp3` filename, actual MP3 content, GPIO2 -> 1 kOhm -> RX and speaker across SPK1/SPK2. Firmware cannot detect missing playback over TX-only control. |
 | Wrong sound plays | Recheck four-digit filenames and the event/file table. Test the actual module/card with the documented `playMp3Folder` layout. |
-| LEDs never light | Check polarity, individual 330 Ohm resistors, common ground and exact GPIO12/GPIO15 connections. Test an actual saved/rejected event, not an empty camera view. |
+| LEDs never light | Check polarity, individual 330 Ohm resistors, common ground and exact GPIO12/GPIO15/GPIO4 connections. Test an actual saved/rejected event, not an empty camera view. |
 | Red LED behavior is strange after adding audio | Confirm DFPlayer TX is completely disconnected from GPIO15. It must not drive the LED output. |
-| White onboard flash switches instead of red LED | Check for an accidental GPIO4 connection. Configured red is GPIO15. |
+| White onboard flash lights for Late | Expected: GPIO4 drives both yellow and the onboard white flash. Red remains GPIO15. |
 | Camera resets when sound starts | Check regulated supply capacity, wiring resistance, common ground and speaker compatibility under load. Do not power the assembly through the adapter's 3.3 V output. |
 | Camera sees the QR but attendance is absent from the table | Read the dashboard feedback and Serial Monitor. Check actual Saved result, selected date, class time, current signed card, server address and token. A visible QR alone does not confirm a save. |
 | Camera image is upside-down | Check `CAMERA_VFLIP` and `CAMERA_HMIRROR` in `config.h`. Both default to 1 for the reported mounting; changing them requires uploading again. |
@@ -311,7 +343,7 @@ Unreadable-card messages are rate-limited and do not immediately overwrite a jus
 - [ ] LCD signals pass through the shifter, with LV = 3.3 V and HV = 5 V.
 - [ ] GPIO2 connects through 1 kOhm to DFPlayer RX; DFPlayer TX has no wire.
 - [ ] The speaker connects only across SPK1/SPK2.
-- [ ] Both LEDs have their own 330 Ohm series resistor and cathode connected to GND.
+- [ ] All three LEDs have their own 330 Ohm series resistor and cathode connected to GND.
 - [ ] GPIO12 has the separate 10 kOhm pull-down to GND and no external pull-up.
 - [ ] The ESP32-CAM microSD slot is unused; audio card is in the DFPlayer.
 - [ ] GPIO0 upload jumper is removed for normal operation.

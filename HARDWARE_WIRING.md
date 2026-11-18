@@ -10,7 +10,7 @@ This guide matches the current firmware in `firmware/AttendanceCam/config.h` and
 - A 16x2 HD44780-compatible LCD with an I2C backpack.
 - A bidirectional I2C logic-level shifter.
 - DFRobot DFPlayer Mini, SKU DFR0299, and a passive speaker suitable for its speaker output.
-- Two separate indicator LEDs (green and red), each with its own 330 Ohm series resistor.
+- Three separate indicator LEDs (green, yellow and red), each with its own 330 Ohm series resistor.
 - One 10 kOhm pull-down resistor from GPIO12 to GND.
 - One regulated 5.0 V supply with enough current for the camera, Wi-Fi and audio load.
 
@@ -29,11 +29,12 @@ The wiring image is [hardware-wiring.svg](hardware-wiring.svg). This is a refere
 | DFPlayer TX | **Leave unconnected** | TX-only commands free GPIO15 for the red LED. Remove any previous TX-to-GPIO15 wire before uploading the new firmware. |
 | Green LED | GPIO12 -> **330 Ohm** -> green LED anode (+); cathode (-) -> GND | Add a **10 kOhm pull-down from GPIO12 to GND**. Never pull GPIO12 high at reset: it is a flash-voltage strapping pin. |
 | Red LED | GPIO15 -> **330 Ohm** -> red LED anode (+); cathode (-) -> GND | Do not also connect DFPlayer TX here. This is an active-high output after boot. |
+| Yellow LED (Late) | GPIO4 -> **330 Ohm** -> yellow LED anode (+); cathode (-) -> GND | GPIO4 also switches the onboard white flash; this is intentional. |
 | Speaker | One speaker lead to DFPlayer `SPK1`; the other to `SPK2` | This is a two-wire speaker output. Neither speaker lead goes to ground. Observe the DFPlayer speaker rating. |
 
 The LCD backpack may pull SDA and SCL up to its supply voltage. This diagram therefore routes both signals through a bidirectional shifter. Do not bypass the shifter unless the exact backpack documentation confirms that its I2C lines are pulled up to 3.3 V and safe for the ESP32.
 
-The sketch uses GPIO2, GPIO12 and GPIO15, which are ESP32 strapping pins. GPIO12 must stay low during reset for the board's normal flash-voltage selection; use the specified LED-to-GND circuit and 10 kOhm pull-down, never an LED module that pulls GPIO12 toward VCC. GPIO15 now drives the red LED, not UART input. If boot or flashing fails, power off and disconnect the external LED/DFPlayer signal wires before retrying. The onboard microSD slot remains unused. GPIO4 is intentionally unused so status indications do not switch the board's bright white flash. Do not use GPIO16/17, which the board needs for PSRAM.
+The sketch uses GPIO2, GPIO12 and GPIO15, which are ESP32 strapping pins. GPIO12 must stay low during reset for the board's normal flash-voltage selection; use the specified LED-to-GND circuit and 10 kOhm pull-down, never an LED module that pulls GPIO12 toward VCC. GPIO15 now drives the red LED, not UART input. If boot or flashing fails, power off and disconnect the external LED/DFPlayer signal wires before retrying. The onboard microSD slot remains unused. GPIO4 drives yellow for Late and also switches the onboard white flash; this shared behavior is intentional. Do not use GPIO16/17, which the board needs for PSRAM.
 
 ## USB-UART flashing connections
 
@@ -72,6 +73,7 @@ These values are read from `firmware/AttendanceCam/config.h`:
 | `LCD_SDA` | GPIO13 | LCD I2C SDA through shifter |
 | `LCD_SCL` | GPIO14 | LCD I2C SCL through shifter |
 | `LED_GREEN` | GPIO12 | 330 Ohm -> green LED anode; cathode -> GND; 10 kOhm pull-down to GND |
+| `LED_YELLOW` | GPIO4 | 330 Ohm -> yellow LED anode; cathode -> GND; also lights onboard white flash |
 | `LED_RED` | GPIO15 | 330 Ohm -> red LED anode; cathode -> GND |
 | `MP3_TX` | GPIO2 | ESP32 TX through 1 kOhm resistor into DFPlayer RX |
 | `LCD_ADDRESS` | `0x27` | Backpack address; some backpacks use `0x3F` |
@@ -87,14 +89,16 @@ The firmware also needs the correct Wi-Fi SSID/password, local server IP and dev
 
 ## Indicators and audio
 
-- Green: the server confirmed a newly saved attendance record (Present, Late or Absent). It does not mean every accepted scan is on time.
-- Red: duplicate/already recorded, invalid/revoked card, class not open or unset, unreadable QR pattern, or camera/network/server failure. An empty scene is idle, not a failure.
-- Each indicator normally lights for about 2.5 seconds. Fatal camera initialization leaves the red indicator on.
-- DFPlayer `/mp3/0001.mp3`: attendance saved; `0002.mp3`: already recorded; `0003.mp3`: invalid card; `0004.mp3`: not saved. Supply the recordings on the DFPlayer's own supported FAT-formatted card. No audio recordings are bundled.
-- The LCD displays the student name followed by Present/Late/Absent after a saved scan, or a duplicate/error message. UART is TX-only, so firmware cannot verify that the audio module/card is present or playback succeeded.
+- Green / GPIO12: newly saved Present; track 0001.
+- Yellow / GPIO4: newly saved Late; track 0005. The onboard white flash also lights.
+- Red / GPIO15: newly saved Absent (0006), duplicate (0002), invalid card (0003), or an error.
+- Ordinary indicators last about 2.5 seconds; fatal initialization holds red on and sends track 0013.
+- Copy all fourteen recordings from [the male audio ZIP](audio/dfplayer-male-14-sd-card.zip) to the DFPlayer card's `mp3` folder, and upload the updated firmware.
+- See the [complete event/audio table](firmware/AttendanceCam/README.md#11-expected-output-behavior).
+- TX-only UART cannot verify playback or card presence. Physical testing remains necessary.
 
 The ESP32 captures native JPEG frames and sends them to the laptop even when the dashboard is closed. The laptop performs QR decoding and verification. No QR-reader Arduino library is needed for the current sketch. Test the camera/server first, then add the LCD, audio and LEDs with power off between changes.
 
 ## Resistors from your available set
 
-Use two **330R** resistors (one per LED), one **1K** resistor (GPIO2 to DFPlayer RX), and one **10K** resistor (GPIO12 to GND pull-down). Resistors have no polarity. The previous 470 Ohm LED value is also acceptable; 330R needs no firmware change. Follow the [detailed DFPlayer wiring, audio card and testing instructions](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
+Use three **330R** resistors (one per LED), one **1K** resistor (GPIO2 to DFPlayer RX), and one **10K** resistor (GPIO12 to GND pull-down). Resistors have no polarity. The previous 470 Ohm LED value is also acceptable; 330R needs no firmware change. Follow the [detailed DFPlayer wiring, audio card and testing instructions](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).

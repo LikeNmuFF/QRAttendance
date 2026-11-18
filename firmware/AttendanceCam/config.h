@@ -7,8 +7,9 @@
 #define CAMERA_FRAME_SIZE FRAMESIZE_VGA
 #define CAMERA_JPEG_QUALITY 12
 #define CAPTURE_INTERVAL_MS 250
-#define LED_GREEN 12 // each LED: GPIO -> 470 ohm resistor -> anode; cathode -> GND
+#define LED_GREEN 12 // Present; each LED: GPIO -> 330 ohm -> anode; cathode -> GND
 #define LED_RED 15   // DFPlayer TX must be disconnected from this pin
+#define LED_YELLOW 4 // Late; also turns on the AI-Thinker board's white flash
 #define WIFI_SSID "testing"
 #define WIFI_PASSWORD "A06C7FD1"
 #define SERVER_URL "http://192.168.254.119:5000/scan"

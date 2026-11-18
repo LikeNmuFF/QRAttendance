@@ -1,5 +1,28 @@
 # Codebase and endpoint audit
 
+## 2026-11-14: fourteen announcements and three status LEDs
+
+The firmware selects the fourteen recordings in `audio/dfplayer-male-14`.
+Present selects track 0001 and green GPIO12; Late selects 0005 and yellow GPIO4;
+Absent selects 0006 and red GPIO15. GPIO4 also switches the onboard white flash,
+as explicitly selected for this assembly. Each external LED needs its own 330 Ohm
+series resistor; GPIO12 retains its 10 kOhm pull-down. DFPlayer TX stays disconnected.
+
+Dropped, early, ended, missing schedule, unreadable QR, connection failure,
+camera/PSRAM failure and initial ready states now select their dedicated tracks.
+Same-error and unreadable-QR announcements are limited to once per 10 seconds;
+offline Wi-Fi is announced after 15 seconds and repeated every 15 seconds.
+Ready plays once per boot after camera initialization and the first Wi-Fi connection;
+it does not verify laptop availability. Audio remains TX-only, with no playback acknowledgment.
+
+Validation: `python firmware/check_feedback.py` passed the source mapping contracts,
+the fourteen-track ZIP and wiring SVG checks passed, and Arduino CLI compilation
+passed for `esp32:esp32:esp32cam` on installed Espressif core 3.2.0 (1,045,274 bytes
+program storage; 55,892 bytes globals). LiquidCrystal I2C emits its existing AVR
+architecture metadata warning; the build succeeds. No board was flashed or physically
+tested. Different incoming events can interrupt prior speech. Earlier dated findings
+below describe prior firmware states, including the former two-LED/four-track mapping.
+
 Audited 2026-11-08. Scope: all application files, HTTP routes, SQLite storage, ESP32 request/response handling, LCD/audio control flow, original launcher and QR helper, and setup documentation. The optional launcher and QR helper were subsequently removed during cleanup; regression tests now live in `python/tests/`. This is a source audit plus isolated software verification, not certification of assembled hardware.
 
 The application now uses Flask with separate routes, database code, Jinja templates and static CSS. Its documented classroom workflow is implemented. It remains a trusted-LAN prototype; the unresolved findings below matter before wider deployment.

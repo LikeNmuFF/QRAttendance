@@ -156,7 +156,10 @@ flowchart TD
     Duplicate -->|No| Open{"Schedule exists and class is open?"}
     Open -->|No| Closed["Not saved: schedule reason"]
     Open -->|Yes| Save["Save Present, Late or Absent"]
-    Save --> Success["Green LED and track 1"]
+    Save --> Result{"Saved status"}
+    Result -->|Present| Present["Green LED + track 1"]
+    Result -->|Late| Late["Yellow LED + white flash + track 5"]
+    Result -->|Absent| Absent["Red LED + track 6"]
 ```
 
 Blank end time means no cutoff. Start locks after the first check-in; end can still be changed or cleared until the teacher finalizes that day. Finalization locks both hours and closes scanning for the date.

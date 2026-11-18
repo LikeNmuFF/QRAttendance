@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="420mm" viewBox="0 0 1600 2263" role="img" aria-labelledby="title desc">
   <title id="title">QR attendance scanner wiring reference</title>
-  <desc id="desc">A3 wiring reference for an AI-Thinker ESP32-CAM, 16 by 2 I2C LCD, bidirectional level shifter, DFRobot DFPlayer Mini DFR0299, speaker, green/red status LEDs and USB-UART adapter, with voltage and pre-power safety checks.</desc>
+  <desc id="desc">A3 wiring reference for an AI-Thinker ESP32-CAM, 16 by 2 I2C LCD, bidirectional level shifter, DFRobot DFPlayer Mini DFR0299, speaker, green/yellow/red status LEDs and USB-UART adapter, with voltage and pre-power safety checks.</desc>
   <defs>
     <style>
       .bg{fill:#f4f7fa}.ink{fill:#102130}.muted{fill:#536675}.white{fill:#fff}.panel{fill:#fff;stroke:#c9d5df;stroke-width:2}.title{font:700 48px Arial,sans-serif;fill:#102130}.subtitle{font:400 23px Arial,sans-serif;fill:#536675}.section{font:700 25px Arial,sans-serif;fill:#102130}.body{font:400 19px Arial,sans-serif;fill:#102130}.small{font:400 16px Arial,sans-serif;fill:#536675}.tiny{font:700 15px Arial,sans-serif;fill:#102130}.pin{font:700 18px Arial,sans-serif;fill:#102130}.value{font:700 18px Arial,sans-serif;fill:#102130}.warning{fill:#fff2d4;stroke:#c98400;stroke-width:2}.warningtext{font:700 18px Arial,sans-serif;fill:#744500}.danger{fill:#fff0ef;stroke:#bd3b35;stroke-width:2}.dangertext{font:700 18px Arial,sans-serif;fill:#8e2924}.mint{fill:#e8f6ef;stroke:#4c9b70;stroke-width:2}.blue{fill:#eaf2fc;stroke:#4f79b6;stroke-width:2}.line5{stroke:#d33b34;stroke-width:6;fill:none}.gnd{stroke:#243746;stroke-width:6;fill:none}.sda{stroke:#21835b;stroke-width:6;fill:none}.scl{stroke:#3476bf;stroke-width:6;fill:none}.uarttx{stroke:#bd6b12;stroke-width:6;fill:none}.uartrx{stroke:#7549a5;stroke-width:6;fill:none}.wirelabel{font:700 16px Arial,sans-serif}.redtxt{fill:#b02722}.greentxt{fill:#17613f}.bluetxt{fill:#235995}.orangetxt{fill:#94520c}.purpletxt{fill:#633b8b}.round{rx:16;ry:16}
@@ -9,7 +9,7 @@
   <rect class="bg" x="0" y="0" width="1600" height="2263" fill="#f4f7fa" />
   <rect x="0" y="0" width="1600" height="22" fill="#4c9b70" />
   <text class="title" x="70" y="100" font-weight="700" font-size="48" font-family="Arial,sans-serif" fill="#102130">QR ATTENDANCE SCANNER</text>
-  <text class="subtitle" x="72" y="145" font-weight="400" font-size="23" font-family="Arial,sans-serif" fill="#536675">AI-Thinker ESP32-CAM / OV3660 + 16x2 I2C LCD + DFPlayer + green/red LEDs</text>
+  <text class="subtitle" x="72" y="145" font-weight="400" font-size="23" font-family="Arial,sans-serif" fill="#536675">AI-Thinker ESP32-CAM / OV3660 + 16x2 I2C LCD + DFPlayer + green/yellow/red LEDs</text>
   <rect class="warning round" x="70" y="175" width="1460" height="105" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
   <text class="warningtext" x="100" y="218" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#744500">REFERENCE FOR THESE MODULE ASSUMPTIONS ONLY</text>
   <text class="body" x="100" y="250" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">Match each module's exact pin labels and datasheet before wiring. If anything differs, STOP. Power off before every change.</text>
@@ -28,10 +28,11 @@
   <rect class="warning round" x="95" y="649" width="450" height="82" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
   <text class="pin" x="120" y="681" font-weight="700" font-size="18" font-family="Arial,sans-serif" fill="#102130">GPIO2 (TX)</text><text class="body" x="270" y="681" font-weight="400" font-size="19" font-family="Arial,sans-serif" fill="#102130">-&gt; 1 kOhm -&gt; DFPlayer RX</text>
   <text class="small" x="120" y="710" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">Keep the series resistor in this direction.</text>
-  <rect class="warning round" x="95" y="743" width="450" height="82" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
+  <rect class="warning round" x="95" y="743" width="450" height="98" fill="#fff2d4" stroke="#c98400" stroke-width="2" rx="16" ry="16" />
   <text class="small" x="115" y="772" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">GPIO12 -&gt; 330R -&gt; GREEN anode; cathode -&gt; GND</text><circle cx="522" cy="766" r="8" fill="#16834b" />
   <text class="small" x="115" y="806" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">GPIO15 -&gt; 330R -&gt; RED anode; cathode -&gt; GND</text><circle cx="522" cy="800" r="8" fill="#c53e3e" />
-  <text class="tiny" x="100" y="850" font-weight="700" font-size="15" font-family="Arial,sans-serif" fill="#102130">GPIO12: 10k to GND. Never pull high during reset.</text>
+  <text class="small" x="115" y="830" font-weight="400" font-size="16" font-family="Arial,sans-serif" fill="#536675">GPIO4 -&gt; 330R -&gt; YELLOW (+ white flash for Late)</text>
+  <text class="tiny" x="100" y="862" font-weight="700" font-size="15" font-family="Arial,sans-serif" fill="#102130">GPIO12: 10k to GND. Never pull high during reset.</text>
 
   <rect class="panel round" x="610" y="365" width="420" height="505" fill="#fff" stroke="#c9d5df" stroke-width="2" rx="16" ry="16" />
   <rect x="610" y="365" width="420" height="58" rx="16" fill="#e8f6ef" />

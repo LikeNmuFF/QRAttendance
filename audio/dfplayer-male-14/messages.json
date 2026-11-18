@@ -1,0 +1,72 @@
+[
+  {
+    "file": "0001.mp3",
+    "event": "Present",
+    "text": "Your attendance has been recorded. You are present."
+  },
+  {
+    "file": "0002.mp3",
+    "event": "Already recorded",
+    "text": "Your attendance has already been recorded."
+  },
+  {
+    "file": "0003.mp3",
+    "event": "Invalid QR card",
+    "text": "Invalid QR card. Please use your official attendance QR card."
+  },
+  {
+    "file": "0004.mp3",
+    "event": "Saving failed",
+    "text": "Your attendance could not be saved. Please try again or contact your instructor."
+  },
+  {
+    "file": "0005.mp3",
+    "event": "Late",
+    "text": "Your attendance has been recorded. You are late."
+  },
+  {
+    "file": "0006.mp3",
+    "event": "Absent",
+    "text": "Your attendance has been recorded as absent. Please speak with your instructor."
+  },
+  {
+    "file": "0007.mp3",
+    "event": "Dropped student",
+    "text": "You are marked as dropped from this class. Please speak with your instructor."
+  },
+  {
+    "file": "0008.mp3",
+    "event": "Class not open",
+    "text": "Attendance for this class is not open yet. Please wait."
+  },
+  {
+    "file": "0009.mp3",
+    "event": "Class ended",
+    "text": "Attendance for this class has closed. Please speak with your instructor."
+  },
+  {
+    "file": "0010.mp3",
+    "event": "Class schedule missing",
+    "text": "The class schedule has not been configured. Please contact your instructor."
+  },
+  {
+    "file": "0011.mp3",
+    "event": "Unreadable QR",
+    "text": "Unable to read your QR card. Please hold it steady in front of the camera."
+  },
+  {
+    "file": "0012.mp3",
+    "event": "Connection problem",
+    "text": "The scanner cannot connect to the attendance server. Please contact your instructor."
+  },
+  {
+    "file": "0013.mp3",
+    "event": "Camera failure",
+    "text": "The camera could not start. Please contact your instructor."
+  },
+  {
+    "file": "0014.mp3",
+    "event": "Ready",
+    "text": "The attendance scanner is ready. Please show your QR card."
+  }
+]
