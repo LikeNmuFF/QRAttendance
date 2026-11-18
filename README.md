@@ -92,7 +92,7 @@ The project uses the AI-Thinker pin map with OV3660/OV2640 support. Physical foc
 
 1. Sign in and register a student with an ID and full name.
 2. Print their website-issued QR card with its white border intact.
-3. Select today's date and save a class schedule that is currently open.
+3. Select today's date and save a class schedule that is currently open. If you have multiple classes or sessions, choose **Use [session] for scanning** on the Attendance page.
 4. Hold the complete QR inside the preview guide, sharply focused and evenly lit.
 5. Confirm the saved attendance row. Records update automatically about every two seconds.
 
@@ -143,7 +143,7 @@ The [14-track male-voice set](audio/dfplayer-male-14/) and [ready-to-copy ZIP](a
 
 ![Current scanner feedback: Present is green with track 1, Late is yellow with white flash and track 5, Absent is red with track 6; duplicate, invalid, and unreadable QR results are red with tracks 2, 3, and 11](docs/assets/status-feedback.svg)
 
-*Saved results use separate lights and audio. The complete track mapping is in the table above; status lights turn off after about 2.5 seconds.*
+*Saved results use separate lights and audio. The complete track mapping is in the table above. Ordinary status lights turn off after about 2.5 seconds; a fatal camera or PSRAM startup failure leaves the red light on because scanning stops.*
 
 ## Class schedule
 
@@ -228,7 +228,7 @@ node python/tests/test_dashboard_live.cjs
 node python/tests/test_camera_preview.cjs
 ```
 
-The class/session, calendar, teacher-audit, and QR-download changes pass **82 Python tests**, dashboard JavaScript checks, and desktop/mobile Chromium checks for navigation, PDF downloads, teacher chances, and day finalization. PDF rendering checks verified pagination, accented/long names, long IDs, and QR decoding from all seven rendered sample cards. The updated firmware compiles for AI Thinker ESP32-CAM on core 3.2.0 (1,043,662 bytes program storage; 55,844 bytes globals). These do not certify physical wiring or scan performance. See [AUDIT.md](AUDIT.md) for earlier hardware verification and limitations.
+The class/session, calendar, teacher-audit, and QR-download changes pass **82 Python tests**, dashboard JavaScript checks, and desktop/mobile Chromium checks for navigation, PDF downloads, teacher chances, and day finalization. PDF rendering checks verified pagination, accented/long names, long IDs, and QR decoding from all seven rendered sample cards. The latest documented firmware build for AI Thinker ESP32-CAM on core 3.2.0 used 1,045,274 bytes of program storage and 55,892 bytes of globals. These checks do not certify physical wiring or scan performance. See [AUDIT.md](AUDIT.md) for build details and hardware verification limits.
 
 | Location | Purpose |
 |---|---|
@@ -245,4 +245,4 @@ Use a **trusted LAN**. Plain HTTP does not encrypt passwords, sessions, frames, 
 
 There is one check-in per student per session per date, no check-out, no offline queue, and no individual teacher accounts. The shared scanner records into one selected session at a time. Signed QR cards prevent altered credentials, but an exact copy of a valid card still works. Supervise scanning when identity matters.
 
-This README uses repository-hosted GIFs and [GitHub-native Mermaid blocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams); no JavaScript embed is needed.
+This README uses a repository-hosted GIF, SVG, and [GitHub-native Mermaid blocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams); no JavaScript embed is needed.

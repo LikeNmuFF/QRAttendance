@@ -277,7 +277,7 @@ Power off between every stage. The LCD is optional: startup probes its configure
 |---|---|---|
 | 1 | ESP32-CAM only | Camera initializes, Wi-Fi connects, laptop server receives frames, and a current website-issued card saves attendance. |
 | 2 | Add level shifter and LCD | No abnormal heating; readable startup text after contrast adjustment; saved results appear on both rows. |
-| 3 | Add LEDs and resistors | GPIO12 has its pull-down; saved attendance lights green; a later duplicate/rejected scan lights red. |
+| 3 | Add LEDs and resistors | GPIO12 has its pull-down; saved Present lights green, Late lights yellow with the onboard white flash, and Absent lights red. A later duplicate/rejected scan also lights red. |
 | 4 | Add DFPlayer, card and speaker | Correct track plays for each result; speaker load does not reset the camera. |
 | 5 | Full assembly | Repeat startup and several different student scans; check camera, Wi-Fi, display, lights and audio together. |
 
