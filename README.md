@@ -2,7 +2,7 @@
 
 **ESP32-CAM QR scanning, a local Flask dashboard, and classroom attendance feedback.**
 
-An AI-Thinker ESP32-CAM captures QR cards and sends JPEG frames over local Wi-Fi. The laptop decodes and verifies each signed card, saves attendance in SQLite, and returns the result. Add a 16x2 LCD, DFPlayer Mini speaker, and separate green/red LEDs when you are ready.
+An AI-Thinker ESP32-CAM captures QR cards and sends JPEG frames over local Wi-Fi. The laptop decodes and verifies each signed card, saves attendance in SQLite, and returns the result. Add a 16x2 LCD, DFPlayer Mini speaker, and separate green, yellow, and red LEDs when you are ready.
 
 ![Illustrated scanning flow from camera to local verification and saved attendance](docs/assets/scan-flow.gif)
 
@@ -108,11 +108,12 @@ Read the **[detailed assembly README](firmware/AttendanceCam/README.md)** before
 | 16x2 I2C LCD | GPIO13 SDA / GPIO14 SCL through the documented level shifter when required; default address `0x27` |
 | Green LED | GPIO12 -> **330R** -> long leg (+); short leg (-) -> GND |
 | GPIO12 pull-down | Separate **10K** from GPIO12 to GND |
+| Yellow LED | GPIO4 -> **330R** -> long leg (+); short leg (-) -> GND; also lights the onboard white flash for Late |
 | Red LED | GPIO15 -> **330R** -> long leg (+); short leg (-) -> GND |
 | DFPlayer Mini | 5 V and common GND; GPIO2 -> **1K** -> RX; **TX unconnected** |
 | Passive speaker | Across DFPlayer **SPK1 and SPK2**; neither terminal to GND |
 
-Each LED needs its own 330R resistor. The earlier 470 Ohm value also works for ordinary indicator LEDs. Keep GPIO12's separate 10K pull-down so it stays low during reset. The ESP32-CAM microSD slot is unused because its pins are reused; DFPlayer has its own card.
+Each of the three LEDs needs its own 330R resistor. The earlier 470 Ohm value also works for ordinary indicator LEDs. Keep GPIO12's separate 10K pull-down so it stays low during reset. The ESP32-CAM microSD slot is unused because its pins are reused; DFPlayer has its own card. A saved Present result lights green, Late lights yellow and the onboard white flash, and Absent lights red.
 
 > [!IMPORTANT]
 > Power off before wiring. ESP32 GPIOs are not 5 V tolerant. Remove any old DFPlayer TX-to-GPIO15 wire before adding the red LED. Follow the detailed guide for LCD level shifting and shared power.
@@ -123,16 +124,26 @@ Put actual MP3 recordings in an `mp3` folder on a supported FAT16/FAT32 microSD 
 
 | File | Event |
 |---|---|
-| `mp3/0001.mp3` | Attendance saved: Present, Late, or Absent |
-| `mp3/0002.mp3` | Already recorded today |
-| `mp3/0003.mp3` | Invalid or revoked QR card |
-| `mp3/0004.mp3` | Attendance not saved, including closed class or server failure |
+| `mp3/0001.mp3` | Present saved |
+| `mp3/0002.mp3` | Already recorded |
+| `mp3/0003.mp3` | Invalid QR card |
+| `mp3/0004.mp3` | Other save failure, including token or server errors |
+| `mp3/0005.mp3` | Late saved |
+| `mp3/0006.mp3` | Absent saved |
+| `mp3/0007.mp3` | Dropped student |
+| `mp3/0008.mp3` | Class not open yet |
+| `mp3/0009.mp3` | Class ended |
+| `mp3/0010.mp3` | Class time unset |
+| `mp3/0011.mp3` | Unreadable QR |
+| `mp3/0012.mp3` | Connection problem or prolonged Wi-Fi outage |
+| `mp3/0013.mp3` | Camera or PSRAM failure |
+| `mp3/0014.mp3` | Ready after first Wi-Fi connection |
 
-Recordings are not included. Firmware uses 9600-baud TX-only commands and volume 22/30. It cannot verify playback/card presence. Missing audio does not prevent saving attendance. See the [DFPlayer wiring and test steps](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
+The [14-track male-voice set](audio/dfplayer-male-14/) and [ready-to-copy ZIP](audio/dfplayer-male-14-sd-card.zip) are included. Copy its `mp3` folder to the DFPlayer card and upload the updated firmware for this mapping. Firmware uses 9600-baud TX-only commands and volume 22/30. It cannot verify playback or card presence. Missing audio does not prevent saving attendance. See the [DFPlayer wiring and test steps](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
 
 ![Illustrated feedback examples: saved green, duplicate red, invalid red, and closed class red](docs/assets/status-feedback.gif)
 
-*Illustrated result examples. Green confirms a newly saved record, including Late or Absent. Unreadable QR patterns use red without audio; empty scenes are idle.*
+*Illustrated result examples from the earlier feedback mapping. Current firmware uses green for Present, yellow plus the onboard white flash for Late, and red for Absent; unreadable QR patterns use red with track 11. Empty scenes are idle.*
 
 ## Class schedule
 
@@ -185,7 +196,7 @@ On **Students & QR cards**, select rows and choose **Download selected PDF**, or
 
 **Select visible students** follows the current search; previously checked students remain selected when hidden by a new search. Downloads preserve existing credentials and dropped status. The earlier ZIP endpoint remains available at `/students/qrcodes.zip`. These web download controls need no firmware update. ReportLab and its dependency are bundled in `offline/wheels`; rerun the offline installer on another PC before starting this version.
 
-Only absences on finalized days count toward the drop rule. On the **fourth** confirmed absence, QR scanning is blocked. The scanner returns HTTP 423; the updated firmware displays **You are dropped** / **See your teacher**, with the red LED and existing failure audio track 4. Reflash the ESP32-CAM to enable this LCD message.
+Only absences on finalized days count toward the drop rule. On the **fourth** confirmed absence, QR scanning is blocked. The scanner returns HTTP 423; the updated firmware displays **You are dropped** / **See your teacher**, with the red LED and dedicated audio track 7. Reflash the ESP32-CAM to enable this feedback.
 
 In **Absence audit**, teachers can inspect totals and individual history, **give another chance** to allow scanning, explicitly **drop** a student, or **apply the four-absence rule** again. A chance remains in effect until the teacher changes it. Decisions require a reason and preserve absence totals. Corrections support Present, Late, Absent, or Excused; reasons and old/new statuses are saved. Excused does not count as absent. Correcting a total below four restores scanning unless the teacher explicitly dropped the student.
 
