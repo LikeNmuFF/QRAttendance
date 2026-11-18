@@ -141,9 +141,9 @@ Put actual MP3 recordings in an `mp3` folder on a supported FAT16/FAT32 microSD 
 
 The [14-track male-voice set](audio/dfplayer-male-14/) and [ready-to-copy ZIP](audio/dfplayer-male-14-sd-card.zip) are included. Copy its `mp3` folder to the DFPlayer card and upload the updated firmware for this mapping. Firmware uses 9600-baud TX-only commands and volume 22/30. It cannot verify playback or card presence. Missing audio does not prevent saving attendance. See the [DFPlayer wiring and test steps](firmware/AttendanceCam/README.md#6-connect-the-dfplayer-mini-and-speaker).
 
-![Illustrated feedback examples: saved green, duplicate red, invalid red, and closed class red](docs/assets/status-feedback.gif)
+![Current scanner feedback: Present is green with track 1, Late is yellow with white flash and track 5, Absent is red with track 6; duplicate, invalid, and unreadable QR results are red with tracks 2, 3, and 11](docs/assets/status-feedback.svg)
 
-*Illustrated result examples from the earlier feedback mapping. Current firmware uses green for Present, yellow plus the onboard white flash for Late, and red for Absent; unreadable QR patterns use red with track 11. Empty scenes are idle.*
+*Saved results use separate lights and audio. The complete track mapping is in the table above; status lights turn off after about 2.5 seconds.*
 
 ## Class schedule
 

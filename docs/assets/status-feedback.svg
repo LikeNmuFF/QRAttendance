@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="450" viewBox="0 0 900 450" role="img" aria-labelledby="title desc">
+  <title id="title">Understand the scanner feedback</title>
+  <desc id="desc">Present saved uses a green LED and track 1. Late saved uses a yellow LED, the onboard white flash, and track 5. Absent saved uses a red LED and track 6. Duplicate, invalid, and unreadable QR results use a red LED and their own audio tracks.</desc>
+  <rect width="900" height="450" fill="#07141c"/>
+  <text x="28" y="48" fill="#ecf4f4" font-family="Arial, sans-serif" font-size="27" font-weight="700">Understand the scanner feedback</text>
+  <text x="28" y="78" fill="#a9bbc3" font-family="Arial, sans-serif" font-size="15">The server confirms the result before the scanner lights up and plays audio.</text>
+
+  <rect x="28" y="108" width="270" height="180" rx="14" fill="#122a34" stroke="#3b626d"/>
+  <circle cx="62" cy="146" r="13" fill="#82d5ae"/>
+  <text x="88" y="152" fill="#a4e3c1" font-family="Arial, sans-serif" font-size="22" font-weight="700">PRESENT</text>
+  <text x="48" y="197" fill="#edf4f2" font-family="Arial, sans-serif" font-size="17">Attendance saved</text>
+  <text x="48" y="232" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Green LED</text>
+  <text x="48" y="260" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Audio track 0001</text>
+
+  <rect x="315" y="108" width="270" height="180" rx="14" fill="#122a34" stroke="#3b626d"/>
+  <circle cx="349" cy="146" r="13" fill="#f6cd68"/>
+  <text x="375" y="152" fill="#f6d986" font-family="Arial, sans-serif" font-size="22" font-weight="700">LATE</text>
+  <text x="335" y="197" fill="#edf4f2" font-family="Arial, sans-serif" font-size="17">Attendance saved</text>
+  <text x="335" y="232" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Yellow LED + white flash</text>
+  <text x="335" y="260" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Audio track 0005</text>
+
+  <rect x="602" y="108" width="270" height="180" rx="14" fill="#122a34" stroke="#3b626d"/>
+  <circle cx="636" cy="146" r="13" fill="#ee8182"/>
+  <text x="662" y="152" fill="#f4a3a1" font-family="Arial, sans-serif" font-size="22" font-weight="700">ABSENT</text>
+  <text x="622" y="197" fill="#edf4f2" font-family="Arial, sans-serif" font-size="17">Attendance saved</text>
+  <text x="622" y="232" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Red LED</text>
+  <text x="622" y="260" fill="#b7cbd0" font-family="Arial, sans-serif" font-size="16">Audio track 0006</text>
+
+  <text x="28" y="327" fill="#d4e2e4" font-family="Arial, sans-serif" font-size="17" font-weight="700">Other scan results</text>
+  <rect x="28" y="346" width="270" height="58" rx="9" fill="#15242d" stroke="#425863"/>
+  <circle cx="48" cy="375" r="7" fill="#ee8182"/>
+  <text x="65" y="380" fill="#dbe5e6" font-family="Arial, sans-serif" font-size="15">Already recorded · 0002</text>
+  <rect x="315" y="346" width="270" height="58" rx="9" fill="#15242d" stroke="#425863"/>
+  <circle cx="335" cy="375" r="7" fill="#ee8182"/>
+  <text x="352" y="380" fill="#dbe5e6" font-family="Arial, sans-serif" font-size="15">Invalid QR · 0003</text>
+  <rect x="602" y="346" width="270" height="58" rx="9" fill="#15242d" stroke="#425863"/>
+  <circle cx="622" cy="375" r="7" fill="#ee8182"/>
+  <text x="639" y="380" fill="#dbe5e6" font-family="Arial, sans-serif" font-size="15">Unreadable QR · 0011</text>
+  <text x="28" y="433" fill="#7895a1" font-family="Arial, sans-serif" font-size="12" letter-spacing="1">QR ATTENDANCE / CURRENT FIRMWARE FEEDBACK</text>
+</svg>
